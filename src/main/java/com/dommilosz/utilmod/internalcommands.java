@@ -1,7 +1,8 @@
 package com.dommilosz.utilmod;
 
-import com.dommilosz.utilmod.commands.umod.modules.autotryjump;
-import com.dommilosz.utilmod.commands.umod.modules.tryjump;
+import com.dommilosz.utilmod.commands.umod.modules.auto_try_jump;
+import com.dommilosz.utilmod.commands.umod.modules.free_interact;
+import com.dommilosz.utilmod.commands.umod.modules.try_jump;
 import com.dommilosz.utilmod.commands.umodcmd;
 
 public class internalcommands {
@@ -26,8 +27,9 @@ public class internalcommands {
 		umodcmd.execute(msg, args);
 	}
 	public static void resetmods(){
-		tryjump.reset();
-		autotryjump.reset();
+		try_jump.reset();
+		auto_try_jump.reset();
+		free_interact.reset();
 	}
 
 

@@ -4,7 +4,7 @@ import com.dommilosz.utilmod.packetIO;
 
 import static com.dommilosz.utilmod.internalcommands.*;
 
-public class autotryjump {
+public class auto_try_jump {
 
     public static boolean enabled;
     public static int delay = 5000;
@@ -16,7 +16,7 @@ public class autotryjump {
 
     public static void execute(String msg, String[] args) {
         if (isElementOn(args, "autotj", 2)) {
-            if(tryjump.issuedEnabled){
+            if(try_jump.issuedEnabled){
                 packetIO.SendMessageToClient("[UMOD] AutoTryjump is not compatible with TryJump");
                 properexecuted = true;
                 return;
@@ -61,41 +61,41 @@ public class autotryjump {
 
             }
             if (isElementOn(args, "reset", 3)) {
-                if(tryjump.executing){
+                if(try_jump.executing){
                     packetIO.SendMessageToClient("[UMOD] AutoTryjump already executing -- Executing abort");
-                    tryjump.executingabort = true;
+                    try_jump.executingabort = true;
                     properexecuted = true;
                     enabled = false;
-                    tryjump.reset();
+                    try_jump.reset();
                     return;
                 }
                 if(!enabled){
                     packetIO.SendMessageToClient("[UMOD] AutoTryjump is not enabled");
                     properexecuted = true;
-                    tryjump.reset();
+                    try_jump.reset();
                     return;
                 }
                 enabled = false;
                 properexecuted = true;
-                tryjump.resetWithTP();
+                try_jump.resetWithTP();
                 packetIO.SendMessageToClient("[UMOD] AutoTryjump Reset");
             }
             if (isElementOn(args, "back", 3)) {
-                if(tryjump.executing){
+                if(try_jump.executing){
                     packetIO.SendMessageToClient("[UMOD] AutoTryjump already executing -- Executing abort");
-                    tryjump.executingabort = true;
+                    try_jump.executingabort = true;
                     properexecuted = true;
-                    tryjump.reset();
+                    try_jump.reset();
                     return;
                 }
                 if(!enabled){
                     packetIO.SendMessageToClient("[UMOD] AutoTryjump is not enabled");
                     properexecuted = true;
-                    tryjump.reset();
+                    try_jump.reset();
                     return;
                 }
                 properexecuted = true;
-                tryjump.resetWithTP();
+                try_jump.resetWithTP();
                 packetIO.SendMessageToClient("[UMOD] AutoTryjump Backed");
             }
         }
@@ -109,12 +109,12 @@ public class autotryjump {
                 while (enabled) {
                     long timestamp = System.currentTimeMillis();
                     started = timestamp;
-                    tryjump.start();
+                    try_jump.start();
                     waitForEndOrDelay();
                     if(!enabled)return;
-                    tryjump.executePacketsSync();
+                    try_jump.executePacketsSync();
                 }
-                tryjump.reset();
+                try_jump.reset();
             }
         }).start();
 
@@ -123,7 +123,7 @@ public class autotryjump {
         long timestamp = System.currentTimeMillis();
         long timestampANDdelay = timestamp+delay;
         while (timestamp<timestampANDdelay){
-            if(!tryjump.enabled){
+            if(!try_jump.enabled){
                 return;
             }
 

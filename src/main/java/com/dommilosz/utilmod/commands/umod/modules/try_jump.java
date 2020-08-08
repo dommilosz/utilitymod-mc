@@ -16,7 +16,7 @@ import static com.dommilosz.utilmod.internalcommands.isElementOn;
 import static com.dommilosz.utilmod.internalcommands.properexecuted;
 import static com.dommilosz.utilmod.colorhandler.Color;
 
-public class tryjump {
+public class try_jump {
 	public static boolean enabled = false;
 	public static boolean issuedEnabled = false;
 	public static boolean executing = false;
@@ -25,7 +25,7 @@ public class tryjump {
 
 	public static void execute(String msg, String[] args) {
 		if (isElementOn(args, "tryjump", 2)) {
-			if(autotryjump.enabled){
+			if(auto_try_jump.enabled){
 				packetIO.SendMessageToClient("[UMOD] Tryjump is not compatible with AutoTryJump");
 				properexecuted = true;
 				return;

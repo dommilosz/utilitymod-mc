@@ -1,7 +1,5 @@
 package com.dommilosz.utilmod.packetevent;
 
-import com.dommilosz.utilmod.commands.umod.modules.autotryjump;
-import com.dommilosz.utilmod.commands.umod.modules.tryjump;
 import com.dommilosz.utilmod.packetEvents;
 import net.minecraft.network.IPacket;
 import net.minecraft.network.play.client.CChatMessagePacket;
@@ -9,7 +7,6 @@ import net.minecraft.network.play.client.CTabCompletePacket;
 import net.minecraft.network.play.server.STabCompletePacket;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import com.dommilosz.utilmod.packetevent.PacketEvent;
 
 import java.util.ArrayList;
 import java.util.List;
