@@ -21,6 +21,11 @@ public class auto_try_jump {
                 properexecuted = true;
                 return;
             }
+            if(macro.enabled){
+                packetIO.SendMessageToClient("[UMOD] AutoTryjump is not compatible with Macro");
+                properexecuted = true;
+                return;
+            }
             if (isElementOn(args, "start", 3)) {
                 if(enabled){
                     packetIO.SendMessageToClient("[UMOD] AutoTryjump already Running");

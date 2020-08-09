@@ -15,6 +15,7 @@ import java.util.List;
 import static com.dommilosz.utilmod.internalcommands.isElementOn;
 import static com.dommilosz.utilmod.internalcommands.properexecuted;
 import static com.dommilosz.utilmod.colorhandler.Color;
+import static com.dommilosz.utilmod.playerFunctions.*;
 
 public class try_jump {
 	public static boolean enabled = false;
@@ -30,6 +31,11 @@ public class try_jump {
 				properexecuted = true;
 				return;
 			}
+            if(macro.enabled){
+                packetIO.SendMessageToClient("[UMOD] Tryjump is not compatible with Macro");
+                properexecuted = true;
+                return;
+            }
 			if (isElementOn(args, "start", 3)) {
 				if(enabled){
 					packetIO.SendMessageToClient("[UMOD] Tryjump already Running");
@@ -89,8 +95,8 @@ public class try_jump {
 		executingabort = false;
 		Minecraft.getInstance().player.setNoGravity(true);
 		backToStart();
-		for (int i = 0; i < TJPacket.packets.size(); i++) {
-			TJPacket p = TJPacket.packets.get(i);
+		for (int i = 0; i < TJpackets.size(); i++) {
+			TJPacket p = TJpackets.get(i);
 
 			if(executingabort){break;}
 			IPacket packet = p.packet;
@@ -99,11 +105,11 @@ public class try_jump {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			TJPacket.allowedpackets.add(packet);
+			TJallowedpackets.add(packet);
 			packetIO.SendPacketToServer(packet);
 			String msg = "";
-			if(i+1==TJPacket.packets.size()) msg = Color.BLUE+ "Sending packets: ["+Color.YELLOW+"DONE"+Color.BLUE+"]";
-			else msg = Color.BLUE+"Sending packets: ["+Color.YELLOW + (i + 1) + "/" + TJPacket.packets.size() + Color.BLUE+"] - "+Color.YELLOW+toGotime(i)+"ms";
+			if(i+1==TJpackets.size()) msg = Color.BLUE+ "Sending packets: ["+Color.YELLOW+"DONE"+Color.BLUE+"]";
+			else msg = Color.BLUE+"Sending packets: ["+Color.YELLOW + (i + 1) + "/" + TJpackets.size() + Color.BLUE+"] - "+Color.YELLOW+toGotime(i)+"ms";
 
 			packetIO.SendStatusMessageToClient(msg,true);
 			if(packet instanceof CPlayerPacket.PositionPacket){
@@ -140,7 +146,7 @@ public class try_jump {
 		enabled = true;
 	}
 	public static void reset(){
-		TJPacket.packets.clear();
+		TJpackets.clear();
 		executing = false;
 		enabled = false;
 		issuedEnabled = false;
@@ -155,7 +161,7 @@ public class try_jump {
 	}
 	public static void backToStart(){
 		if(enabled){
-			setPosRot(lastPos.X,lastPos.Y,lastPos.Z,lastPos.Yaw,lastPos.Pitch);
+			PF_setPosRot(lastPos.X,lastPos.Y,lastPos.Z,lastPos.Yaw,lastPos.Pitch);
 		}
 	}
 	public static class lastPos{
@@ -176,48 +182,49 @@ public class try_jump {
 	}
 	public static void ModifyPacketTryJump(IPacket packet, PacketEvent event){
 		if(enabled){
-			if(TJPacket.allowedpackets.contains(packet)){
-				TJPacket.allowedpackets.remove(packet);
+			if(TJallowedpackets.contains(packet)){
+				TJallowedpackets.remove(packet);
 				return;
 			}
 			if(packet instanceof CPlayerPacket.PositionPacket){
 				if(executing){event.setCanceled(true);return;}
-				new TJPacket(packet);
+				new TJPacket(packet,TJpackets);
 				event.setPacket(new CPlayerPacket.PositionPacket(lastPos.X,lastPos.Y,lastPos.Z,lastPos.onGround));
 
 			}
 			if(packet instanceof CPlayerAbilitiesPacket){
 				if(executing){event.setCanceled(true);return;}
-				new TJPacket(packet);
+				new TJPacket(packet,TJpackets);
 				event.setCanceled(true);
 			}
 			if(packet instanceof CPlayerPacket.RotationPacket){
 				if(executing){event.setCanceled(true);return;}
-				new TJPacket(packet);
+				new TJPacket(packet,TJpackets);
 				//event.setPacket(new CPlayerPacket.RotationPacket(lastPos.Pitch,lastPos.Yaw,lastPos.onGround));
 				event.setCanceled(true);
 			}
 			if(packet instanceof CPlayerPacket.PositionRotationPacket){
 				if(executing){event.setCanceled(true);return;}
-				new TJPacket(packet);
+				new TJPacket(packet,TJpackets);
 				//event.setPacket(new CPlayerPacket.PositionRotationPacket(lastPos.X,lastPos.Y,lastPos.Z,lastPos.Pitch,lastPos.Yaw,lastPos.onGround));
 				event.setCanceled(true);
 			}
 			if(packet instanceof CEntityActionPacket){
 				if(executing){event.setCanceled(true);return;}
-				new TJPacket(packet);
+				new TJPacket(packet,TJpackets);
 				event.setCanceled(true);
 			}
 		}
 
 	}
+	public static List<TJPacket> TJpackets = new ArrayList<TJPacket>();
+	public static List<IPacket> TJallowedpackets = new ArrayList<IPacket>();
+	
 	public static class TJPacket{
-		public static List<TJPacket> packets = new ArrayList<TJPacket>();
-		public static List<IPacket> allowedpackets = new ArrayList<IPacket>();
 		public IPacket packet;
 		public long timediff;
 		public long timestamp;
-		public TJPacket(IPacket packet){
+		public TJPacket(IPacket packet,List<TJPacket> packets){
 			TJPacket lastpacket = new TJPacket();
 			long timestamp = System.currentTimeMillis();
 			lastpacket.timediff = 0;
@@ -228,7 +235,7 @@ public class try_jump {
 			}
 			timediff = (timestamp-lastpacket.timestamp);
 			this.packet = packet;
-			String msg = Color.RED+ "Recording packets: ["+Color.YELLOW+TJPacket.packets.size()+Color.RED+"] - "+Color.YELLOW+pasttime()+"ms";
+			String msg = Color.RED+ "Recording packets: ["+Color.YELLOW+packets.size()+Color.RED+"] - "+Color.YELLOW+pasttime()+"ms";
 			packetIO.SendStatusMessageToClient(msg,true);
 			packets.add(this);
 		}
@@ -236,13 +243,19 @@ public class try_jump {
 		public TJPacket(){
 
 		}
+		public TJPacket(IPacket packet, List<TJPacket> packets, int timediff) {
+			this.timestamp = System.currentTimeMillis();
+			this.timediff = timediff;
+			this.packet = packet;
+			packets.add(this);
+		}
 	}
 	public static int pasttime() {
 		long timestamp = System.currentTimeMillis();
 		return (int) (timestamp-startedtime);
 	}
 	public static int toGotime(int i) {
-		List<TJPacket> packets = TJPacket.packets;
+		List<TJPacket> packets = TJpackets;
 		int sumtime = 0;
 		for (; i < packets.size(); i++) {
 			TJPacket packet = packets.get(i);
@@ -250,18 +263,5 @@ public class try_jump {
 		}
 		return sumtime;
 	}
-	public static void setPosition(double x,double y,double z){
-		Minecraft.getInstance().player.setPosition(x,y,z);
 
-	}
-	public static void setPosRot(double x,double y,double z,float yaw,float pitch){
-		Minecraft.getInstance().player.setPositionAndRotation(x,y,z,yaw,pitch);
-	}
-	public static void setRot(float yaw,float pitch){
-		ClientPlayerEntity playerEntity = Minecraft.getInstance().player;
-		double x = playerEntity.getPosX();
-		double y= playerEntity.getPosY();
-		double z= playerEntity.getPosZ();
-		Minecraft.getInstance().player.setPositionAndRotation(x,y,z,yaw,pitch);
-	}
 }

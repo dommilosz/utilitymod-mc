@@ -19,22 +19,11 @@ public class packetIO {
 	public static void SendPacketToServer(IPacket<?> packet) {
 		Minecraft.getInstance().player.connection.sendPacket(packet);
 	}
-	public static void SendPacketToClient(IPacket<?> packet) {
-		PacketListener.writeToClient(packet);
-	}
 	public static void SendMessageToClient(String msg) {
 		Minecraft.getInstance().player.sendMessage(new StringTextComponent(msg));
 	}
 	public static void SendStatusMessageToClient(String msg,boolean actionbar) {
 		Minecraft.getInstance().player.sendStatusMessage(new StringTextComponent(msg),actionbar);
-	}
-	public static StringTextComponent ReplaceMCColorChar(String msg){
-		StringTextComponent stc = new StringTextComponent(msg);
-		Style style = stc.getStyle();
-
-		style.setColor(TextFormatting.DARK_GREEN);
-
-		return stc;
 	}
 	public static void SendChat(String msg) {
 		SendPacketToServer(new CChatMessagePacket(msg));
