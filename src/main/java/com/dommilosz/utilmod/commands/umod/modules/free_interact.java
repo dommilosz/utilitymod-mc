@@ -12,8 +12,7 @@ public class free_interact {
     public static boolean enabled = false;
     public static void execute(String msg, String[] args) {
         if (isElementOn(args, "freeinteract", 2)) {
-            enabled = !enabled;
-            packetIO.SendMessageToClient("[UMOD] FreeInteract is now: "+enabled);
+            commandActions.CAtoggle();
         }
     }
     public static void ModifyPacketsToFreeInteract(IPacket packet,PacketEvent event){
@@ -31,5 +30,11 @@ public class free_interact {
     }
     public static void start(){
         enabled = true;
+    }
+    public static class commandActions{
+        public static void CAtoggle(){
+            enabled = !enabled;
+            packetIO.SendMessageToClient("[UMOD] FreeInteract is now: "+enabled);
+        }
     }
 }

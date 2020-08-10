@@ -23,128 +23,31 @@ public class macro {
 
     public static void execute(String msg, String[] args) {
         if (isElementOn(args, "macro", 2)) {
-            if (try_jump.issuedEnabled) {
-                packetIO.SendMessageToClient("[UMOD] Macro is not compatible with TryJump");
-                properexecuted = true;
-                return;
-            }
-            if (auto_try_jump.enabled) {
-                packetIO.SendMessageToClient("[UMOD] Macro is not compatible with AutoTryJump");
-                properexecuted = true;
-                return;
-            }
+            if(!commandActions.isCompatible())return;
             if (isElementOn(args, "load", 3)) {
-                if (try_jump.executing) {
-                    packetIO.SendMessageToClient("[UMOD] Macro already Running");
-                    properexecuted = true;
-                    return;
-                }
-                if (isElementOn(args, "", 4)) {
-                    packetIO.SendMessageToClient("[UMOD] Invalid macro file name");
-                    return;
-                }
-                MacroManager.load(getElementOn(args, 4));
-                properexecuted = true;
-                packetIO.SendMessageToClient("[UMOD] Macro Loaded");
-
+                commandActions.CAload(getElementOn(args,4));
             }
             if (isElementOn(args, "save", 3)) {
-                if (isElementOn(args, "", 4)) {
-                    packetIO.SendMessageToClient("[UMOD] Invalid macro file name");
-                    return;
-                }
-                MacroManager.save(getElementOn(args, 4));
-                properexecuted = true;
-                packetIO.SendMessageToClient("[UMOD] Macro Saved to " + getElementOn(args, 4));
-
+                commandActions.CAsave(getElementOn(args,4));
             }
             if (isElementOn(args, "reset", 3)) {
-                if (try_jump.executing) {
-                    packetIO.SendMessageToClient("[UMOD] Macro already executing -- Executing abort");
-                    try_jump.executingabort = true;
-                    properexecuted = true;
-                    enabled = false;
-                    try_jump.reset();
-                    return;
-                }
-                if (!enabled) {
-                    packetIO.SendMessageToClient("[UMOD] Macro is not enabled");
-                    properexecuted = true;
-                    try_jump.reset();
-                    return;
-                }
-                enabled = false;
-                properexecuted = true;
-                try_jump.resetWithTP();
-                packetIO.SendMessageToClient("[UMOD] Macro Reset");
+                commandActions.CAreset();
             }
             if (isElementOn(args, "record", 3)) {
-                try_jump.start();
-                PlayerEntity pl = Minecraft.getInstance().player;
-
-                int blockX = MathHelper.floor(pl.getPosX());
-                int blockY = MathHelper.floor(pl.getPosY()) - 1;
-                int blockZ = MathHelper.floor(pl.getPosZ());
-
-                MacroManager.aligninfo.X = pl.getPosX() - blockX;
-                MacroManager.aligninfo.Y = pl.getPosY() - blockY;
-                MacroManager.aligninfo.Z = pl.getPosZ() - blockZ;
-
-                MacroManager.aligninfo.Yaw = pl.getYaw(0);
-                MacroManager.aligninfo.Pitch = pl.getPitch(0);
-
-                packetIO.SendMessageToClient("[UMOD] Recording started");
-                properexecuted = true;
+                commandActions.CArecord();
             }
             if (isElementOn(args, "endrecord", 3)) {
-                MacroManager.loadedPackets = MacroManager.toRelPackets(try_jump.TJpackets);
-                try_jump.resetWithTP();
-                packetIO.SendMessageToClient("[UMOD] Recording stopped");
-                properexecuted = true;
-                MacroManager.save("0tmp01134");
-                MacroManager.load("0tmp01134");
+                commandActions.CAendrecord();
             }
             if (isElementOn(args, "play", 3)) {
-
-                start();
-                packetIO.SendMessageToClient("[UMOD] Playback started.");
-                properexecuted = true;
+                commandActions.CAplay();
             }
             if (isElementOn(args, "loadplay", 3)) {
-                if (try_jump.executing) {
-                    packetIO.SendMessageToClient("[UMOD] Macro already Running");
-                    properexecuted = true;
-                    return;
-                }
-                if (isElementOn(args, "", 4)) {
-                    packetIO.SendMessageToClient("[UMOD] Invalid macro file name");
-                    return;
-                }
-                if(!MacroManager.load(getElementOn(args, 4)))return;
-                properexecuted = true;
-                packetIO.SendMessageToClient("[UMOD] Macro Loaded");
-                start();
-                packetIO.SendMessageToClient("[UMOD] Playback started.");
-                properexecuted = true;
+                commandActions.CAloadplay(getElementOn(args,4));
             }
             if (isElementOn(args, "rotloadplay", 3)) {
-                if (try_jump.executing) {
-                    packetIO.SendMessageToClient("[UMOD] Macro already Running");
-                    properexecuted = true;
-                    return;
-                }
-                if (isElementOn(args, "", 4)) {
-                    packetIO.SendMessageToClient("[UMOD] Invalid macro file name");
-                    return;
-                }
-                String rotationStr = PF_getRotationString();
+                commandActions.CArotloadplay(getElementOn(args,4));
 
-                if(!MacroManager.load(getElementOn(args, 4)+"_"+rotationStr))return;
-                properexecuted = true;
-                packetIO.SendMessageToClient("[UMOD] Macro Loaded");
-                start();
-                packetIO.SendMessageToClient("[UMOD] Playback started.");
-                properexecuted = true;
             }
         }
     }
@@ -512,5 +415,140 @@ public class macro {
 
     public static void reset() {
         enabled = false;
+    }
+    public static class commandActions{
+        public static boolean isCompatible(){
+            if (try_jump.issuedEnabled) {
+                packetIO.SendMessageToClient("[UMOD] Macro is not compatible with TryJump");
+                properexecuted = true;
+                return false;
+            }
+            if (auto_try_jump.enabled) {
+                packetIO.SendMessageToClient("[UMOD] Macro is not compatible with AutoTryJump");
+                properexecuted = true;
+                return false;
+            }
+            return true;
+        }
+
+        public static void CAload(String filename) {
+            if (try_jump.executing) {
+                packetIO.SendMessageToClient("[UMOD] Macro already Running");
+                properexecuted = true;
+                return;
+            }
+            if (filename.equals("")) {
+                packetIO.SendMessageToClient("[UMOD] Invalid macro file name");
+                return;
+            }
+            MacroManager.load(filename);
+            properexecuted = true;
+            packetIO.SendMessageToClient("[UMOD] Macro Loaded");
+
+        }
+
+        public static void CAsave(String filename) {
+            if (filename.equals("")) {
+                packetIO.SendMessageToClient("[UMOD] Invalid macro file name");
+                return;
+            }
+            MacroManager.save(filename);
+            properexecuted = true;
+            packetIO.SendMessageToClient("[UMOD] Macro Saved to " + filename);
+
+        }
+
+        public static void CAreset() {
+            if (try_jump.executing) {
+                packetIO.SendMessageToClient("[UMOD] Macro already executing -- Executing abort");
+                try_jump.executingabort = true;
+                properexecuted = true;
+                enabled = false;
+                try_jump.reset();
+                return;
+            }
+            if (!enabled) {
+                packetIO.SendMessageToClient("[UMOD] Macro is not enabled");
+                properexecuted = true;
+                try_jump.reset();
+                return;
+            }
+            enabled = false;
+            properexecuted = true;
+            try_jump.resetWithTP();
+            packetIO.SendMessageToClient("[UMOD] Macro Reset");
+        }
+
+        public static void CArecord() {
+            try_jump.start();
+            PlayerEntity pl = Minecraft.getInstance().player;
+
+            int blockX = MathHelper.floor(pl.getPosX());
+            int blockY = MathHelper.floor(pl.getPosY()) - 1;
+            int blockZ = MathHelper.floor(pl.getPosZ());
+
+            MacroManager.aligninfo.X = pl.getPosX() - blockX;
+            MacroManager.aligninfo.Y = pl.getPosY() - blockY;
+            MacroManager.aligninfo.Z = pl.getPosZ() - blockZ;
+
+            MacroManager.aligninfo.Yaw = pl.getYaw(0);
+            MacroManager.aligninfo.Pitch = pl.getPitch(0);
+
+            packetIO.SendMessageToClient("[UMOD] Recording started");
+            properexecuted = true;
+        }
+
+        public static void CAendrecord() {
+            MacroManager.loadedPackets = MacroManager.toRelPackets(try_jump.TJpackets);
+            try_jump.resetWithTP();
+            packetIO.SendMessageToClient("[UMOD] Recording stopped");
+            properexecuted = true;
+            MacroManager.save("0tmp01134");
+            MacroManager.load("0tmp01134");
+        }
+
+        public static void CAplay() {
+            start();
+            packetIO.SendMessageToClient("[UMOD] Playback started.");
+            properexecuted = true;
+        }
+
+        public static void CAloadplay(String filename) {
+            if (try_jump.executing) {
+                packetIO.SendMessageToClient("[UMOD] Macro already Running");
+                properexecuted = true;
+                return;
+            }
+            if (filename.equals("")) {
+                packetIO.SendMessageToClient("[UMOD] Invalid macro file name");
+                return;
+            }
+            if(!MacroManager.load(filename))return;
+            properexecuted = true;
+            packetIO.SendMessageToClient("[UMOD] Macro Loaded");
+            start();
+            packetIO.SendMessageToClient("[UMOD] Playback started.");
+            properexecuted = true;
+        }
+
+        public static void CArotloadplay(String filename) {
+            if (try_jump.executing) {
+                packetIO.SendMessageToClient("[UMOD] Macro already Running");
+                properexecuted = true;
+                return;
+            }
+            if (filename.equals("")) {
+                packetIO.SendMessageToClient("[UMOD] Invalid macro file name");
+                return;
+            }
+            String rotationStr = PF_getRotationString();
+
+            if(!MacroManager.load(filename+"_"+rotationStr))return;
+            properexecuted = true;
+            packetIO.SendMessageToClient("[UMOD] Macro Loaded");
+            start();
+            packetIO.SendMessageToClient("[UMOD] Playback started.");
+            properexecuted = true;
+        }
     }
 }

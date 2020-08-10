@@ -16,92 +16,19 @@ public class auto_try_jump {
 
     public static void execute(String msg, String[] args) {
         if (isElementOn(args, "autotj", 2)) {
-            if(try_jump.issuedEnabled){
-                packetIO.SendMessageToClient("[UMOD] AutoTryjump is not compatible with TryJump");
-                properexecuted = true;
-                return;
-            }
-            if(macro.enabled){
-                packetIO.SendMessageToClient("[UMOD] AutoTryjump is not compatible with Macro");
-                properexecuted = true;
-                return;
-            }
+            if(!commandActions.isCompatible())return;
             if (isElementOn(args, "start", 3)) {
-                if(enabled){
-                    packetIO.SendMessageToClient("[UMOD] AutoTryjump already Running");
-                    properexecuted = true;
-                    return;
-                }
-                start();
-                properexecuted = true;
-                packetIO.SendMessageToClient("[UMOD] AutoTryjump Started");
-
+                commandActions.start();
             }
             if (isElementOn(args, "delay", 3)) {
-                properexecuted = true;
-                if(isElementOn(args,"",4)){
-                    packetIO.SendMessageToClient("[UMOD] AutoTryjump delay is: "+delay+"ms");
-                    properexecuted = true;
-                    return;
-                }
-                if(enabled){
-                    packetIO.SendMessageToClient("[UMOD] AutoTryjump already Running");
-                    properexecuted = true;
-                    return;
-                }
-                try {
-                    String ds = getElementOn(args,4);
-                    int di = Integer.parseInt(ds);
-                    if(di>=500&&di<=30000){
-                        delay = di;
-                        packetIO.SendMessageToClient("[UMOD] AutoTryjump delay is now: "+delay+"ms");
-                        return;
-                    }
-                }catch (Exception ex){
-                    packetIO.SendMessageToClient("[UMOD] AutoTryjump delay was not int");
-                    return;
-                }
-                packetIO.SendMessageToClient("[UMOD] AutoTryjump delay was not in range [500-30000] ms");
-
+                commandActions.setDelay(getElementOn(args,4));
 
             }
             if (isElementOn(args, "reset", 3)) {
-                if(try_jump.executing){
-                    packetIO.SendMessageToClient("[UMOD] AutoTryjump already executing -- Executing abort");
-                    try_jump.executingabort = true;
-                    properexecuted = true;
-                    enabled = false;
-                    try_jump.reset();
-                    return;
-                }
-                if(!enabled){
-                    packetIO.SendMessageToClient("[UMOD] AutoTryjump is not enabled");
-                    properexecuted = true;
-                    try_jump.reset();
-                    return;
-                }
-                enabled = false;
-                properexecuted = true;
-                try_jump.resetWithTP();
-                packetIO.SendMessageToClient("[UMOD] AutoTryjump Reset");
+                commandActions.CAreset();
             }
             if (isElementOn(args, "back", 3)) {
-                if(try_jump.executing){
-                    packetIO.SendMessageToClient("[UMOD] AutoTryjump already executing -- Executing abort");
-                    try_jump.executingabort = true;
-                    properexecuted = true;
-                    try_jump.reset();
-                    return;
-                }
-                if(!enabled){
-                    packetIO.SendMessageToClient("[UMOD] AutoTryjump is not enabled");
-                    properexecuted = true;
-                    try_jump.reset();
-                    return;
-                }
-                properexecuted = true;
-                try_jump.resetWithTP();
-                packetIO.SendMessageToClient("[UMOD] AutoTryjump Backed");
+                commandActions.CAback();
             }
         }
     }
@@ -142,5 +69,95 @@ public class auto_try_jump {
     }
     public static void reset(){
         enabled = false;
+    }
+    public static class commandActions{
+        public static void start(){
+            if(enabled){
+                packetIO.SendMessageToClient("[UMOD] AutoTryjump already Running");
+                properexecuted = true;
+                return;
+            }
+            start();
+            properexecuted = true;
+            packetIO.SendMessageToClient("[UMOD] AutoTryjump Started");
+        }
+        public static void setDelay(String delayString){
+            properexecuted = true;
+            if(delayString.equals("")){
+                packetIO.SendMessageToClient("[UMOD] AutoTryjump delay is: "+delay+"ms");
+                properexecuted = true;
+                return;
+            }
+            if(enabled){
+                packetIO.SendMessageToClient("[UMOD] AutoTryjump already Running");
+                properexecuted = true;
+                return;
+            }
+            try {
+                String ds = delayString;
+                int di = Integer.parseInt(ds);
+                if(di>=500&&di<=30000){
+                    delay = di;
+                    packetIO.SendMessageToClient("[UMOD] AutoTryjump delay is now: "+delay+"ms");
+                    return;
+                }
+            }catch (Exception ex){
+                packetIO.SendMessageToClient("[UMOD] AutoTryjump delay was not int");
+                return;
+            }
+            packetIO.SendMessageToClient("[UMOD] AutoTryjump delay was not in range [500-30000] ms");
+
+        }
+        public static boolean isCompatible(){
+            if(try_jump.issuedEnabled){
+                packetIO.SendMessageToClient("[UMOD] AutoTryjump is not compatible with TryJump");
+                properexecuted = true;
+                return false;
+            }
+            if(macro.enabled){
+                packetIO.SendMessageToClient("[UMOD] AutoTryjump is not compatible with Macro");
+                properexecuted = true;
+                return false;
+            }
+            return true;
+        }
+        public static void CAreset(){
+            if(try_jump.executing){
+                packetIO.SendMessageToClient("[UMOD] AutoTryjump already executing -- Executing abort");
+                try_jump.executingabort = true;
+                properexecuted = true;
+                enabled = false;
+                try_jump.reset();
+                return;
+            }
+            if(!enabled){
+                packetIO.SendMessageToClient("[UMOD] AutoTryjump is not enabled");
+                properexecuted = true;
+                try_jump.reset();
+                return;
+            }
+            enabled = false;
+            properexecuted = true;
+            try_jump.resetWithTP();
+            packetIO.SendMessageToClient("[UMOD] AutoTryjump Reset");
+        }
+        public static void CAback(){
+            if(try_jump.executing){
+                packetIO.SendMessageToClient("[UMOD] AutoTryjump already executing -- Executing abort");
+                try_jump.executingabort = true;
+                properexecuted = true;
+                try_jump.reset();
+                return;
+            }
+            if(!enabled){
+                packetIO.SendMessageToClient("[UMOD] AutoTryjump is not enabled");
+                properexecuted = true;
+                try_jump.reset();
+                return;
+            }
+            properexecuted = true;
+            try_jump.resetWithTP();
+            packetIO.SendMessageToClient("[UMOD] AutoTryjump Backed");
+        }
     }
 }

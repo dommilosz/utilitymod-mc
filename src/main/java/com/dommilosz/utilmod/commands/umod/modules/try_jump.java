@@ -26,57 +26,15 @@ public class try_jump {
 
 	public static void execute(String msg, String[] args) {
 		if (isElementOn(args, "tryjump", 2)) {
-			if(auto_try_jump.enabled){
-				packetIO.SendMessageToClient("[UMOD] Tryjump is not compatible with AutoTryJump");
-				properexecuted = true;
-				return;
-			}
-            if(macro.enabled){
-                packetIO.SendMessageToClient("[UMOD] Tryjump is not compatible with Macro");
-                properexecuted = true;
-                return;
-            }
+			if(!macro.commandActions.isCompatible())return;
 			if (isElementOn(args, "start", 3)) {
-				if(enabled){
-					packetIO.SendMessageToClient("[UMOD] Tryjump already Running");
-					properexecuted = true;
-					return;
-				}
-				start();
-				issuedEnabled = true;
-				properexecuted = true;
-				packetIO.SendMessageToClient("[UMOD] Tryjump Started");
-
+				commandActions.CAstart();
 			}
 			if (isElementOn(args, "do", 3)) {
-				if(executing){
-					packetIO.SendMessageToClient("[UMOD] Tryjump already Executing");
-					properexecuted = true;
-					return;
-				}
-				packetIO.SendMessageToClient("[UMOD] Tryjump Executing Started");
-				executePackets();
-				properexecuted = true;
-				packetIO.SendMessageToClient("[UMOD] Tryjump Executing Ended");
+				commandActions.CAdo();
 			}
 			if (isElementOn(args, "reset", 3)) {
-				if(executing){
-					packetIO.SendMessageToClient("[UMOD] Tryjump already executing -- Executing abort");
-					executingabort = true;
-					properexecuted = true;
-					reset();
-					return;
-				}
-				if(!enabled){
-					packetIO.SendMessageToClient("[UMOD] Tryjump is not enabled");
-					properexecuted = true;
-					reset();
-					return;
-				}
-				issuedEnabled = false;
-				properexecuted = true;
-				resetWithTP();
-				packetIO.SendMessageToClient("[UMOD] Tryjump Reset");
+				commandActions.CAreset();
 			}
 		}
 	}
@@ -262,6 +220,65 @@ public class try_jump {
 			sumtime+=packet.timediff;
 		}
 		return sumtime;
+	}
+	public static class commandActions{
+		public static boolean isCompatible(){
+			if(auto_try_jump.enabled){
+				packetIO.SendMessageToClient("[UMOD] Tryjump is not compatible with AutoTryJump");
+				properexecuted = true;
+				return false;
+			}
+			if(macro.enabled){
+				packetIO.SendMessageToClient("[UMOD] Tryjump is not compatible with Macro");
+				properexecuted = true;
+				return false;
+			}
+			return true;
+		}
+
+		public static void CAstart() {
+			if(enabled){
+				packetIO.SendMessageToClient("[UMOD] Tryjump already Running");
+				properexecuted = true;
+				return;
+			}
+			start();
+			issuedEnabled = true;
+			properexecuted = true;
+			packetIO.SendMessageToClient("[UMOD] Tryjump Started");
+		}
+
+		public static void CAdo() {
+			if(executing){
+				packetIO.SendMessageToClient("[UMOD] Tryjump already Executing");
+				properexecuted = true;
+				return;
+			}
+			packetIO.SendMessageToClient("[UMOD] Tryjump Executing Started");
+			executePackets();
+			properexecuted = true;
+			packetIO.SendMessageToClient("[UMOD] Tryjump Executing Ended");
+		}
+
+		public static void CAreset() {
+			if(executing){
+				packetIO.SendMessageToClient("[UMOD] Tryjump already executing -- Executing abort");
+				executingabort = true;
+				properexecuted = true;
+				reset();
+				return;
+			}
+			if(!enabled){
+				packetIO.SendMessageToClient("[UMOD] Tryjump is not enabled");
+				properexecuted = true;
+				reset();
+				return;
+			}
+			issuedEnabled = false;
+			properexecuted = true;
+			resetWithTP();
+			packetIO.SendMessageToClient("[UMOD] Tryjump Reset");
+		}
 	}
 
 }

@@ -1,14 +1,13 @@
 package com.dommilosz.utilmod;
 
-import com.dommilosz.utilmod.commands.umod.modules.free_interact;
-import com.dommilosz.utilmod.commands.umod.modules.try_jump;
+import com.dommilosz.utilmod.commands.umod.modules.*;
 import net.minecraft.network.IPacket;
 import net.minecraft.network.play.client.CChatMessagePacket;
 import com.dommilosz.utilmod.packetevent.PacketEvent;
 
 public class packetEvents {
 	public static void onIncoming(PacketEvent.Incoming event,IPacket packet){
-
+		signwriter.ModifyPacketsToSignPlacer(packet,event);
 	}
 	public static void onOutgoing(PacketEvent.Outgoing event,IPacket packet){
 		try_jump.ModifyPacketTryJump(packet,event);
