@@ -22,49 +22,61 @@ import static com.dommilosz.utilmod.internalcommands.*;
 
 public class signwriter {
     public static boolean enabled = false;
-    public static String[] lines = new String[] {"","","",""};
+    public static String[] lines = new String[]{"", "", "", ""};
     public static int delay = 150;
+
     public static void execute(String msg, String[] args) {
         if (isElementOn(args, "signwriter", 2)) {
-            if(isElementOn(args,"on",3)){
+            if (isElementOn(args, "on", 3)) {
                 commandActions.CAon();
             }
-            if(isElementOn(args,"off",3)){
+            if (isElementOn(args, "off", 3)) {
                 commandActions.CAoff();
             }
             if (isElementOn(args, "setline", 3)) {
+                try {
+                    List<String> argsl = new ArrayList<>();
+                    for (String arg : args) {
+                        argsl.add(arg);
+                    }
 
-                List<String> argsl = new ArrayList<>();
-                for(String arg:args){
-                    argsl.add(arg);
+                    argsl.remove(0);
+                    argsl.remove(0);
+                    argsl.remove(0);
+                    argsl.remove(0);
+                    argsl.remove(0);
+
+                    commandActions.CAsetLine(getElementOn(args, 4), String.join(" ", argsl));
+                } catch (Exception ex) {
                 }
-
-                argsl.remove(0);
-                argsl.remove(0);
-                argsl.remove(0);
-                argsl.remove(0);
-                argsl.remove(0);
-
-                commandActions.CAsetLine(getElementOn(args,4),String.join(" ", argsl));
             }
             if (isElementOn(args, "clearlines", 3)) {
                 commandActions.CAclearLines();
             }
             if (isElementOn(args, "delay", 3)) {
-                commandActions.CAsetDelay(getElementOn(args,4));
+                commandActions.CAsetDelay(getElementOn(args, 4));
             }
             if (isElementOn(args, "load", 3)) {
-                commandActions.CAload(getElementOn(args,4));
+                commandActions.CAload(getElementOn(args, 4));
             }
             if (isElementOn(args, "save", 3)) {
-                commandActions.CAsave(getElementOn(args,4));
+                commandActions.CAsave(getElementOn(args, 4));
+            }
+            if (isElementOn(args, "lines", 3)) {
+                packetIO.SendMessageToClient("[UMOD] SignWriter Lines:");
+                packetIO.SendMessageToClient("Line1: \"" + lines[0] + "\"");
+                packetIO.SendMessageToClient("Line2: \"" + lines[1] + "\"");
+                packetIO.SendMessageToClient("Line3: \"" + lines[2] + "\"");
+                packetIO.SendMessageToClient("Line4: \"" + lines[3] + "\"");
+                properexecuted = true;
             }
         }
 
     }
-    public static void ModifyPacketsToSignPlacer(IPacket packet, PacketEvent event){
-        if(enabled){
-            if(packet instanceof SOpenSignMenuPacket){
+
+    public static void ModifyPacketsToSignPlacer(IPacket packet, PacketEvent event) {
+        if (enabled) {
+            if (packet instanceof SOpenSignMenuPacket) {
                 event.setCanceled(true);
                 BlockPos signPos = ((SOpenSignMenuPacket) packet).getSignPosition();
                 try {
@@ -72,19 +84,22 @@ public class signwriter {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                packetIO.SendPacketToServer(new CUpdateSignPacket(signPos,new StringTextComponent(lines[0]),new StringTextComponent(lines[1]),new StringTextComponent(lines[2]),new StringTextComponent(lines[3])));
+                packetIO.SendPacketToServer(new CUpdateSignPacket(signPos, new StringTextComponent(lines[0]), new StringTextComponent(lines[1]), new StringTextComponent(lines[2]), new StringTextComponent(lines[3])));
                 packetIO.SendMessageToClient("[UMOD] SignWriter Sent Packet");
 
             }
         }
     }
-    public static void reset(){
+
+    public static void reset() {
         enabled = false;
     }
-    public static void start(){
+
+    public static void start() {
         enabled = true;
     }
-    public static void save(String fileName){
+
+    public static void save(String fileName) {
         try {
             File file = new File(Minecraft.getInstance().gameDir.getAbsolutePath() + "/UMOD");
             if (!file.exists()) file.mkdir();
@@ -98,10 +113,10 @@ public class signwriter {
             FileWriter fw = new FileWriter(file);
             BufferedWriter writer = new BufferedWriter(fw);
             JSONObject alignobj = new JSONObject();
-            alignobj.put("line0",lines[0]);
-            alignobj.put("line1",lines[1]);
-            alignobj.put("line2",lines[2]);
-            alignobj.put("line3",lines[3]);
+            alignobj.put("line0", lines[0]);
+            alignobj.put("line1", lines[1]);
+            alignobj.put("line2", lines[2]);
+            alignobj.put("line3", lines[3]);
             writer.append(alignobj.toString());
             writer.flush();
             writer.close();
@@ -113,7 +128,8 @@ public class signwriter {
 
         packetIO.SendMessageToClient("Lines successfully saved!");
     }
-    public static boolean load(String fileName){
+
+    public static boolean load(String fileName) {
         try {
             File file = new File(Minecraft.getInstance().gameDir.getAbsolutePath() + "/UMOD/signwriter/" + fileName + ".json");
             if (!file.exists()) {
@@ -121,7 +137,7 @@ public class signwriter {
             }
             FileReader fr = new FileReader(file);
             Scanner s = new Scanner(fr);
-            String json =s.nextLine();
+            String json = s.nextLine();
 
             JSONObject alignobj = new JSONObject(json);
             lines[0] = alignobj.getString("line0");
@@ -136,28 +152,30 @@ public class signwriter {
         packetIO.SendMessageToClient("Lines successfully loaded!");
         return true;
     }
-    public static class commandActions{
+
+    public static class commandActions {
         public static void CAon() {
             enabled = true;
-            packetIO.SendMessageToClient("[UMOD] SignWriter is now: "+enabled);
+            packetIO.SendMessageToClient("[UMOD] SignWriter is now: " + enabled);
             properexecuted = true;
         }
 
         public static void CAoff() {
             enabled = false;
-            packetIO.SendMessageToClient("[UMOD] SignWriter is now: "+enabled);
+            packetIO.SendMessageToClient("[UMOD] SignWriter is now: " + enabled);
             properexecuted = true;
         }
 
         public static void CAsetLine(String index, String txt) {
             int line = -1;
             try {
-                line = Integer.parseInt(index)-1;
+                line = Integer.parseInt(index) - 1;
 
                 lines[line] = txt;
-                packetIO.SendMessageToClient("[UMOD] SignWriter line["+(line+1)+"] is now: "+lines[line]);
+                packetIO.SendMessageToClient("[UMOD] SignWriter line[" + (line + 1) + "] is now: \"" + lines[line]+"\"");
                 properexecuted = true;
-            }catch (Exception ex){}
+            } catch (Exception ex) {
+            }
         }
 
         public static void CAclearLines() {
@@ -171,20 +189,20 @@ public class signwriter {
 
         public static void CAsetDelay(String delaystr) {
             properexecuted = true;
-            if(delaystr.equals("")){
-                packetIO.SendMessageToClient("[UMOD] SignWriter delay is: "+delay+"ms");
+            if (delaystr.equals("")) {
+                packetIO.SendMessageToClient("[UMOD] SignWriter delay is: " + delay + "ms");
                 properexecuted = true;
                 return;
             }
             try {
                 String ds = delaystr;
                 int di = Integer.parseInt(ds);
-                if(di>=10&&di<=2000){
+                if (di >= 10 && di <= 2000) {
                     delay = di;
-                    packetIO.SendMessageToClient("[UMOD] SignWriter delay is now: "+delay+"ms");
+                    packetIO.SendMessageToClient("[UMOD] SignWriter delay is now: " + delay + "ms");
                     return;
                 }
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 packetIO.SendMessageToClient("[UMOD] SignWriter delay was not int");
                 return;
             }
@@ -203,6 +221,7 @@ public class signwriter {
             packetIO.SendMessageToClient("[UMOD] Lines Loaded");
 
         }
+
         public static void CAsave(String filename) {
             if (filename.equals("")) {
                 packetIO.SendMessageToClient("[UMOD] Invalid lines file name");

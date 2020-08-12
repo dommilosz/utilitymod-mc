@@ -1,5 +1,5 @@
 package com.dommilosz.utilmod.commands;
-import com.dommilosz.utilmod.commands.umod.logging;
+import com.dommilosz.utilmod.commands.umod.*;
 import com.dommilosz.utilmod.commands.umod.modules.*;
 
 import static com.dommilosz.utilmod.internalcommands.*;
@@ -15,6 +15,7 @@ public class umodcmd {
 			free_interact.execute(msg, args);
 			macro.execute(msg, args);
 			signwriter.execute(msg, args);
+			gui.execute(msg,args);
 			if(!properexecuted){
 				packetIO.SendMessageToClient("Usage:");
 				packetIO.SendMessageToClient("/umod logging <in|out|all|off|filter OR /umod mod <module> <action...>");
