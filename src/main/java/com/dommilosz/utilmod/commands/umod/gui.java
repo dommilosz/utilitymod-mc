@@ -9,12 +9,14 @@ import net.minecraft.network.play.client.CPlayerDiggingPacket;
 import net.minecraft.network.play.client.CPlayerTryUseItemOnBlockPacket;
 
 import static com.dommilosz.utilmod.internalcommands.isElementOn;
+import static com.dommilosz.utilmod.internalcommands.properexecuted;
 
 public class gui {
     public static boolean enabled = false;
     public static void execute(String msg, String[] args) {
         if (isElementOn(args, "gui", 1)) {
             commandActions.CAShow();
+            properexecuted = true;
         }
     }
     public static void show(){

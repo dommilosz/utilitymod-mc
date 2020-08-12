@@ -1,5 +1,6 @@
 package com.dommilosz.utilmod;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.Minecraft;
@@ -8,6 +9,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -53,24 +55,28 @@ public class rendering_util {
         drawRectRaw(x, y, width, height, color, 0.00F);
     }
 
-    public static void drawText(String text, int x, int y, Color Color, FontRenderer fontRenderer) {
-        fontRenderer.drawString(text, x, y, ColortoHex(Color));
+    public static void drawText(String text, int x, int y, Color Color, double scale) {
+        FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
+        GL11.glPushMatrix();
+        GL11.glScalef((float)scale, (float) scale, (float) scale);
+        fontRenderer.drawStringWithShadow(text, x, y, ColortoHex(Color));
+        //drawRect(x/scale,y/scale,50,50,new Color(255, 0, 0,255));
+        GL11.glPopMatrix();
     }
 
-    public static void drawText(String text, int x, int y, Color Color) {
-        FontRenderer f = Minecraft.getInstance().fontRenderer;
-        drawText(text, x, y, Color, f);
-    }
+    public static void drawTextCenterMiddle(String text, Rectangle rect, Color Color, double scale) {
+        FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
+        double fontWidth = fontRenderer.getStringWidth(text) * scale;
+        double fontHeight = fontRenderer.FONT_HEIGHT * scale;
+        int rectx = rect.x;
+        int recty = rect.y;
+        int rectw = rect.width;
+        int recth = rect.height;
 
-    public static void drawTextCenterMiddle(String text, Rectangle rect, Color Color, FontRenderer fontRenderer) {
-        int x = rect.x + (rect.width - fontRenderer.getStringWidth(text)) / 2;
-        int y = rect.y + ((rect.height - fontRenderer.FONT_HEIGHT) / 2); //+ metrics.getAscent();
-        //drawRect(rect,new Color(255,255,255,255));
-        drawText(text, x, y, Color, fontRenderer);
-    }
-
-    public static void drawTextCenterMiddle(String text, Rectangle rect, Color Color) {
-        drawTextCenterMiddle(text, rect, Color, Minecraft.getInstance().fontRenderer);
+        int x = (int) Math.floor((rectx + (rectw - fontWidth) / 2)/scale);
+        int y = (int) Math.floor((recty + ((recth - fontHeight) / 2))/scale);
+        //drawRect(rect,new Color(255,255,255,100));
+        drawText(text, x, y, Color, scale);
     }
 
     public static int ColortoHex(Color color) {
@@ -87,6 +93,7 @@ public class rendering_util {
     }
 
     public static class drawableObject {
+        public boolean visible = true;
         public List<drawableObject> children = new ArrayList<drawableObject>();
         public Color color;
         public int x;
@@ -120,6 +127,9 @@ public class rendering_util {
         }
 
         public boolean checkClick(int mouseX, int mouseY) {
+            for (drawableObject child : children) {
+                child.checkClick(mouseX, mouseY);
+            }
             if (isHovered(mouseX, mouseY)) {
                 if (clicked_callback != null)
                     clicked_callback.run();
@@ -172,6 +182,7 @@ public class rendering_util {
 
         @Override
         public void drawThis(int mouseX, int mouseY, Color Color, float z) {
+            if (!visible) return;
             drawRect(this.rect, Color, z);
             for (drawableObject child : children) {
                 child.drawThis(mouseX, mouseY, child.color, z + 1);
@@ -180,20 +191,40 @@ public class rendering_util {
     }
 
     public static class interactiveText extends drawableObject {
-        public FontRenderer fontRenderer = mc.fontRenderer;
         public String text;
+        public double scale;
 
-        public interactiveText(int x, int y,int width,int height, String text, Color color) {
-            this.text = text;
+        public interactiveText(int x, int y, int width, int height, String text, Color color, int scale) {
+            if(!scaling){
+                this.scale = scale;
+            }else {
+                this.scale = scaleAbsolute(scale);
+            }
             this.x = x;
             this.y = y;
-
             this.width = width;
             this.height = height;
+            this.text = text;
             this.rect = new Rectangle(x, y, width, height);
             this.color = color;
             color_hover = color;
 
+        }
+
+        public interactiveText(int x, int y, int width, int height, String text, Color color) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            this.text = text;
+            this.rect = new Rectangle(x, y, width, height);
+            this.color = color;
+            color_hover = color;
+            if(!scaling){
+                this.scale = scale;
+            }else {
+                this.scale = scaleAbsolute(scale);
+            }
         }
 
         @Override
@@ -203,17 +234,38 @@ public class rendering_util {
 
         @Override
         public void drawThis(int mouseX, int mouseY, Color Color, float z) {
-            drawTextCenterMiddle(text, rect, color, fontRenderer);
+            if (!visible) return;
+            drawTextCenterMiddle(text, rect, color, scale);
             for (drawableObject child : children) {
                 child.drawThis(mouseX, mouseY, child.color, z + 1);
             }
         }
     }
+
     public static class interactiveButton extends drawableObject {
-        public FontRenderer fontRenderer = mc.fontRenderer;
         public String text;
         public Color txtColor;
-        public interactiveButton(int x, int y, int width, int height,String txt, Color color,Color txtColor) {
+        public double scale = 1;
+
+        public interactiveButton(int x, int y, int width, int height, String txt, Color color, double scale, Color txtColor) {
+            if(!scaling){
+                this.scale = scale;
+            }else {
+                this.scale = scaleAbsolute(scale);
+            }
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            this.color = color;
+            color_hover = color;
+            rect = new Rectangle(x, y, width, height);
+            this.scale = scale;
+            this.text = txt;
+            this.txtColor = txtColor;
+        }
+
+        public interactiveButton(int x, int y, int width, int height, String txt, Color color, Color txtColor) {
             this.x = x;
             this.y = y;
             this.width = width;
@@ -223,6 +275,11 @@ public class rendering_util {
             rect = new Rectangle(x, y, width, height);
             this.text = txt;
             this.txtColor = txtColor;
+            if(!scaling){
+                this.scale = scale;
+            }else {
+                this.scale = scaleAbsolute(scale);
+            }
         }
 
         @Override
@@ -232,8 +289,10 @@ public class rendering_util {
 
         @Override
         public void drawThis(int mouseX, int mouseY, Color Color, float z) {
+            if (!visible) return;
             drawRect(this.rect, Color, z);
-            drawTextCenterMiddle(text,rect,txtColor,fontRenderer);
+            drawTextCenterMiddle(text, rect, txtColor, scale);
+
             for (drawableObject child : children) {
                 child.drawThis(mouseX, mouseY, child.color, z + 1);
             }
@@ -249,4 +308,20 @@ public class rendering_util {
         Screen scr = Minecraft.getInstance().currentScreen;
         return (int) Math.floor((scr.height / 1000f) * part);
     }
+
+    public static int screenXAbsolute(double part) {
+        Screen scr = Minecraft.getInstance().currentScreen;
+        return (int) Math.floor((scr.width / 1000f) * part);
+    }
+
+    public static int screenYAbsolute(double part) {
+        Screen scr = Minecraft.getInstance().currentScreen;
+        return (int) Math.floor((scr.height / 1000f) * part);
+    }
+    public static double scaleAbsolute(double scale){
+        Screen scr = Minecraft.getInstance().currentScreen;
+        double scaled = ((double) (scr.height/320f)*(double)scale);
+        return scaled;
+    }
+    public static boolean scaling = false;
 }

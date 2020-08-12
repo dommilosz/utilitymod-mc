@@ -10,6 +10,7 @@ public class logging {
 
 	public static void execute(String msg, String[] args) {
 		if (isElementOn(args, "logging", 1)) {
+			properexecuted = true;
 			if (isElementOn(args, "out", 2)) {
 				setLoggingType(args[2]);
 				properexecuted = true;
