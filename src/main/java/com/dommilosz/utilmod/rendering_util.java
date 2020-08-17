@@ -3,10 +3,13 @@ package com.dommilosz.utilmod;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
+import net.java.games.input.Keyboard;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
@@ -162,6 +165,17 @@ public class rendering_util {
             child.rect = new Rectangle(child.x, child.y, child.width, child.height);
             this.children.add(child);
         }
+
+        public void handleKeyPress(int key, int scanCode, int modifiers) {
+            for (drawableObject child : children) {
+                child.handleKeyPress(key, scanCode, modifiers);
+            }
+        }
+        public void handleCharTyped(int key, int scanCode) {
+            for (drawableObject child : children) {
+                child.handleCharTyped(key, scanCode);
+            }
+        }
     }
 
     public static class interactiveRect extends drawableObject {
@@ -296,6 +310,110 @@ public class rendering_util {
             for (drawableObject child : children) {
                 child.drawThis(mouseX, mouseY, child.color, z + 1);
             }
+        }
+    }
+    public static class interactiveTextField extends drawableObject {
+        public String text;
+        public Color txtColor;
+        public double scale = 1;
+        public boolean active = false;
+        Runnable typed_callback;
+        public TextFieldWidget field;
+
+        public interactiveTextField(int x, int y, int width, int height, String txt, Color color, double scale, Color txtColor) {
+            if(!scaling){
+                this.scale = scale;
+            }else {
+                this.scale = scaleAbsolute(scale);
+            }
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            this.color = color;
+            color_hover = color;
+            rect = new Rectangle(x, y, width, height);
+            this.scale = scale;
+            this.text = txt;
+            this.txtColor = txtColor;
+            field =(new TextFieldWidget(Minecraft.getInstance().fontRenderer, x,y,width,height,text));
+            field.setText(txt);
+
+        }
+
+        public interactiveTextField(int x, int y, int width, int height, String txt, Color color, Color txtColor) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            this.color = color;
+            color_hover = color;
+            rect = new Rectangle(x, y, width, height);
+            this.text = txt;
+            this.txtColor = txtColor;
+            if(!scaling){
+                this.scale = scale;
+            }else {
+                this.scale = scaleAbsolute(scale);
+            }
+            field =(new TextFieldWidget(Minecraft.getInstance().fontRenderer, x,y,width,height,txt));
+            field.setText(txt);
+        }
+        public void setTyped_callback(Runnable callback){
+            typed_callback = callback;
+        }
+        @Override
+        public void drawThis(int mouseX, int mouseY, Color Color) {
+            drawThis(mouseX, mouseY, Color, -255);
+        }
+
+        @Override
+        public void drawThis(int mouseX, int mouseY, Color Color, float z) {
+            if (!visible) return;
+            if(field!=null){
+                field.x = x;
+                field.y = y;
+                field.setWidth(width);
+                field.setHeight(height);
+                field.render(mouseX,mouseY,z);
+            }
+
+            for (drawableObject child : children) {
+                child.drawThis(mouseX, mouseY, child.color, z + 1);
+            }
+        }
+
+        @Override
+        public boolean checkClick(int mouseX, int mouseY) {
+            if(field!=null)
+            field.mouseClicked(mouseX,mouseY,0);
+            for (drawableObject child : children) {
+                child.checkClick(mouseX, mouseY);
+            }
+            active = false;
+            if (isHovered(mouseX, mouseY)) {
+                active = true;
+                if (clicked_callback != null)
+                    clicked_callback.run();
+                return true;
+            }
+            return false;
+        }
+        @Override
+        public void handleKeyPress(int key,int scanCode,int modifiers){
+            field.keyPressed(key,scanCode,modifiers);
+            if (typed_callback != null)
+                typed_callback.run();
+            super.handleKeyPress(key, scanCode, modifiers);
+        }
+
+        @Override
+        public void handleCharTyped(int key, int scanCode) {
+            if(field!=null)
+            field.charTyped((char)key,scanCode);
+            if (typed_callback != null)
+                typed_callback.run();
+            super.handleCharTyped(key, scanCode);
         }
     }
 

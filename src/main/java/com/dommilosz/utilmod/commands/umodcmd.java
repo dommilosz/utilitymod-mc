@@ -10,6 +10,7 @@ public class umodcmd {
 		if (isElementOn(args, "/umod", 0)) {
 			executed = true;
 			logging.execute(msg, args);
+			module.execute(msg,args);
 			gui.execute(msg,args);
 			if(!properexecuted){
 				packetIO.SendMessageToClient("Usage:");

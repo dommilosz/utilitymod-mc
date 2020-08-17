@@ -26,7 +26,7 @@ public class try_jump {
 
 	public static void execute(String msg, String[] args) {
 		if (isElementOn(args, "tryjump", 2)) {
-			if(!macro.commandActions.isCompatible())return;
+			if(!commandActions.isCompatible())return;
 			if (isElementOn(args, "start", 3)) {
 				commandActions.CAstart();
 			}
