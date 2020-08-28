@@ -3,17 +3,16 @@ package com.dommilosz.utilmod;
 import com.dommilosz.utilmod.commands.umod.logging;
 import com.dommilosz.utilmod.commands.umod.modules.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.EditSignScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.tileentity.SignTileEntity;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 
 import javax.annotation.Nullable;
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.dommilosz.utilmod.rendering_util.*;
@@ -45,11 +44,14 @@ public class umod_gui extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        for (rendering_util.drawableObject DObject : drawableObjects) {
-            DObject.checkClick((int) mouseX, (int) mouseY);
-        }
-        for (Widget w:buttons){
-            w.mouseClicked(mouseX, mouseY, button);
+        try {
+            for (rendering_util.drawableObject DObject : drawableObjects) {
+                DObject.checkClick((int) mouseX, (int) mouseY);
+            }
+            for (Widget w : buttons) {
+                w.mouseClicked(mouseX, mouseY, button);
+            }
+        } catch (Exception ex) {
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -110,6 +112,12 @@ public class umod_gui extends Screen {
             case 6:
                 setMacroPreset();
                 break;
+            case 7:
+                FSPPrompt.render();
+                break;
+            case -1:
+                drawableObjects.clear();
+                break;
             case 0:
             default:
                 setMainPreset();
@@ -143,8 +151,8 @@ public class umod_gui extends Screen {
         for (rendering_util.drawableObject DObject : drawableObjects) {
             DObject.handleKeyPress(key, scanCode, modifiers);
         }
-        for (Widget w:buttons){
-            w.keyPressed(key,scanCode,modifiers);
+        for (Widget w : buttons) {
+            w.keyPressed(key, scanCode, modifiers);
         }
         return super.keyPressed(key, scanCode, modifiers);
     }
@@ -152,12 +160,12 @@ public class umod_gui extends Screen {
     @Override
     public boolean charTyped(char p_charTyped_1_, int p_charTyped_2_) {
         for (rendering_util.drawableObject DObject : drawableObjects) {
-            DObject.handleCharTyped(p_charTyped_1_,p_charTyped_2_);
+            DObject.handleCharTyped(p_charTyped_1_, p_charTyped_2_);
         }
-        for (Widget w:buttons){
+        for (Widget w : buttons) {
             w.charTyped(p_charTyped_1_, p_charTyped_2_);
         }
-        return super.charTyped(p_charTyped_1_,p_charTyped_2_);
+        return super.charTyped(p_charTyped_1_, p_charTyped_2_);
     }
 
     double spacing4 = 1200d / 9d;
@@ -181,7 +189,7 @@ public class umod_gui extends Screen {
         rendering_util.drawableObject child2;
 
         tmp = drawBackground();
-        drawHeader("Main Menu",tmp);
+        drawHeader("Main Menu", tmp);
 
         child = new rendering_util.interactiveButton(screenXAbsolute(50), screenYAbsolute(125), screenXAbsolute(100), screenYAbsolute(50), "Logging", defaultButtonColor, textColor);
         child.color_hover = defaultButtonHoverColor;
@@ -213,7 +221,7 @@ public class umod_gui extends Screen {
         rendering_util.drawableObject child2;
 
         tmp = drawBackground();
-        drawHeader("Logging",tmp);
+        drawHeader("Logging", tmp);
 
         child = new rendering_util.interactiveButton(screenXAbsolute(50), screenYAbsolute(125), screenXAbsolute(100), screenYAbsolute(50), "OFF", logging.logging_type.equals("off") ? disabledColor : defaultButtonColor, textColor);
         child.color_hover = logging.logging_type.equals("off") ? disabledHoverColor : defaultButtonHoverColor;
@@ -270,7 +278,7 @@ public class umod_gui extends Screen {
         rendering_util.drawableObject child2;
 
         tmp = drawBackground();
-        drawHeader("Modules",tmp);
+        drawHeader("Modules", tmp);
 
         child = new rendering_util.interactiveButton(screenXAbsolute(50 + 0 * spacing4), screenYAbsolute(125), screenXAbsolute(100), screenYAbsolute(50), "TRYJUMP", try_jump.issuedEnabled ? enabledColor : defaultButtonColor, textColor);
         child.color_hover = try_jump.issuedEnabled ? enabledHoverColor : defaultButtonHoverColor;
@@ -292,6 +300,14 @@ public class umod_gui extends Screen {
         child.color_hover = free_interact.enabled ? enabledHoverColor : disabledHoverColor;
         child.setCallbackOnClick(() -> {
             free_interact.commandActions.CAtoggle();
+            init();
+        });
+        tmp.addChild(child);
+
+        child = new rendering_util.interactiveButton(screenXAbsolute(50 + 1 * spacing4), screenYAbsolute(200), screenXAbsolute(100), screenYAbsolute(50), "FULLBRIGHT", fullbright.enabled ? enabledColor : disabledColor, 0.8, textColor);
+        child.color_hover = fullbright.enabled ? enabledHoverColor : disabledHoverColor;
+        child.setCallbackOnClick(() -> {
+            fullbright.commandActions.CAtoggle();
             init();
         });
         tmp.addChild(child);
@@ -328,7 +344,7 @@ public class umod_gui extends Screen {
         rendering_util.drawableObject child2;
 
         tmp = drawBackground();
-        drawHeader("TryJump",tmp);
+        drawHeader("TryJump", tmp);
 
         child = new rendering_util.interactiveButton(screenXAbsolute(50 + 0 * spacing3), screenYAbsolute(125), screenXAbsolute(spacing4), screenYAbsolute(50), "START", enabledColor, textColor);
         child.color_hover = enabledHoverColor;
@@ -370,7 +386,7 @@ public class umod_gui extends Screen {
         rendering_util.drawableObject child2;
 
         tmp = drawBackground();
-        drawHeader("AutoTryJump",tmp);
+        drawHeader("AutoTryJump", tmp);
 
         child = drawBackButton(tmp);
         child.setCallbackOnClick(() -> {
@@ -386,40 +402,40 @@ public class umod_gui extends Screen {
         rendering_util.drawableObject child2;
 
         tmp = drawBackground();
-        drawHeader("SignWriter",tmp);
+        drawHeader("SignWriter", tmp);
 
 
         interactiveTextField child11 = new rendering_util.interactiveTextField(screenXAbsolute(50 + 2 * spacing3), screenYAbsolute(125), screenXAbsolute(spacing4), screenYAbsolute(50), signwriter.lines[0], disabledColor, textColor);
         child11.color_hover = disabledHoverColor;
-        child11.setTyped_callback(()->{
+        child11.setTyped_callback(() -> {
             signwriter.lines[0] = child11.field.getText();
         });
         tmp.addChild(child11);
 
         interactiveTextField child12 = new rendering_util.interactiveTextField(screenXAbsolute(50 + 2 * spacing3), screenYAbsolute(200), screenXAbsolute(spacing4), screenYAbsolute(50), signwriter.lines[1], disabledColor, textColor);
         child12.color_hover = disabledHoverColor;
-        child12.setTyped_callback(()->{
+        child12.setTyped_callback(() -> {
             signwriter.lines[1] = child12.field.getText();
         });
         tmp.addChild(child12);
 
         interactiveTextField child13 = new rendering_util.interactiveTextField(screenXAbsolute(50 + 2 * spacing3), screenYAbsolute(275), screenXAbsolute(spacing4), screenYAbsolute(50), signwriter.lines[2], disabledColor, textColor);
         child13.color_hover = disabledHoverColor;
-        child13.setTyped_callback(()->{
+        child13.setTyped_callback(() -> {
             signwriter.lines[2] = child13.field.getText();
         });
         tmp.addChild(child13);
 
         interactiveTextField child14 = new rendering_util.interactiveTextField(screenXAbsolute(50 + 2 * spacing3), screenYAbsolute(350), screenXAbsolute(spacing4), screenYAbsolute(50), signwriter.lines[3], disabledColor, textColor);
         child14.color_hover = disabledHoverColor;
-        child14.setTyped_callback(()->{
+        child14.setTyped_callback(() -> {
             signwriter.lines[3] = child14.field.getText();
         });
         tmp.addChild(child14);
 
-        drawableObject child = new rendering_util.interactiveButton(screenXAbsolute(50 + 2 * spacing3), screenYAbsolute(425), screenXAbsolute(spacing4), screenYAbsolute(50), signwriter.enabled?"Disable":"Enable", signwriter.enabled?disabledColor:enabledColor, textColor);
-        child.color_hover = signwriter.enabled?disabledHoverColor:enabledHoverColor;
-        child.setCallbackOnClick(()->{
+        drawableObject child = new rendering_util.interactiveButton(screenXAbsolute(50 + 2 * spacing3), screenYAbsolute(425), screenXAbsolute(spacing4), screenYAbsolute(50), signwriter.enabled ? "Disable" : "Enable", signwriter.enabled ? disabledColor : enabledColor, textColor);
+        child.color_hover = signwriter.enabled ? disabledHoverColor : enabledHoverColor;
+        child.setCallbackOnClick(() -> {
             if (signwriter.enabled) {
                 signwriter.commandActions.CAoff();
             } else {
@@ -427,13 +443,33 @@ public class umod_gui extends Screen {
             }
             init();
         });
-
         tmp.addChild(child);
+
         child = new rendering_util.interactiveButton(screenXAbsolute(50 + 1 * spacing3), screenYAbsolute(425), screenXAbsolute(spacing4), screenYAbsolute(50), "Clear", disabledColor, textColor);
         child.color_hover = disabledHoverColor;
-        child.setCallbackOnClick(()->{
+        child.setCallbackOnClick(() -> {
             signwriter.commandActions.CAclearLines();
             init();
+        });
+        tmp.addChild(child);
+
+        child = new rendering_util.interactiveButton(screenXAbsolute(50 + 1 * spacing3), screenYAbsolute(125), screenXAbsolute(spacing4), screenYAbsolute(50), "LOAD", defaultButtonColor, textColor);
+        child.color_hover = defaultButtonHoverColor;
+        child.setCallbackOnClick(() -> {
+            FileLoadPromt fp = new FileLoadPromt(Minecraft.getInstance().gameDir.getAbsolutePath() + "/UMOD/signwriter/", "json", 0, () -> {
+                signwriter.commandActions.CAload(FSPPath);
+                init();
+            });
+        });
+        tmp.addChild(child);
+
+        child = new rendering_util.interactiveButton(screenXAbsolute(50 + 0 * spacing3), screenYAbsolute(125), screenXAbsolute(spacing4), screenYAbsolute(50), "SAVE", defaultButtonColor, textColor);
+        child.color_hover = defaultButtonHoverColor;
+        child.setCallbackOnClick(() -> {
+            new FileSavePromt(() -> {
+                signwriter.commandActions.CAsave(FSPPath);
+                init();
+            });
         });
         tmp.addChild(child);
 
@@ -453,13 +489,166 @@ public class umod_gui extends Screen {
         rendering_util.drawableObject child2;
 
         tmp = drawBackground();
-        drawHeader("Macro",tmp);
+        drawHeader("Macro", tmp);
 
         child = drawBackButton(tmp);
         child.setCallbackOnClick(() -> {
             setModulePreset();
             init();
         });
+    }
+
+    public String FSPPath = "";
+    public FilePrompt FSPPrompt;
+    public class FilePrompt{
+        int lastPreset;
+        String folderPath;
+        String extension;
+        int page;
+        Runnable callback;
+        public void render(){
+            if(this instanceof FileLoadPromt){
+                ((FileLoadPromt) this).setFileSelectPreset();
+            }
+            if(this instanceof FileSavePromt){
+                ((FileSavePromt) this).setFileSavePreset();
+            }
+        }
+    }
+    public class FileLoadPromt extends FilePrompt {
+        public FileLoadPromt(String folderPath, String extension, int page, Runnable callback){
+            this.lastPreset = preset;
+            this.folderPath = folderPath;
+            this.extension = extension;
+            this.callback = callback;
+            FSPPrompt = this;
+            setFileSelectPreset();
+        }
+        public void setFileSelectPreset() {
+            if (!macro.commandActions.isCompatible()) return;
+            drawableObjects.clear();
+            preset = 7;
+            rendering_util.drawableObject tmp;
+            rendering_util.drawableObject child;
+            rendering_util.drawableObject child2;
+
+            tmp = drawBackground();
+            drawHeader("LOAD FILE [PAGE :"+page+"]", tmp);
+
+            FSPPath = "";
+            try {
+                File dir = new File(folderPath);
+                if (!dir.isDirectory()) throw new Exception();
+                if (!dir.exists()) throw new Exception();
+
+                List<File> files = Arrays.asList(dir.listFiles());
+                List<File> vfiles = new ArrayList<>();
+                List<File> pagefiles = new ArrayList<>();
+                for (File f : files) {
+                    if (f.getName().endsWith("." + extension)) {
+                        vfiles.add(f);
+                    }
+                }
+                if(vfiles.size()<page * 20){page--;init();}
+                if(page<0){page++;init();}
+                for (int i = 0; i < vfiles.size(); i++) {
+                    File f = vfiles.get(i);
+                    if (i >= page * 20 && i < (page + 1) * 20) {
+                        pagefiles.add(f);
+                    }
+                }
+                for (int i = 0; i < pagefiles.size(); i++) {
+                    File f = pagefiles.get(i);
+                    int off = i % 4;
+                    int voff = i/4;
+                    child = new rendering_util.interactiveButton(screenXAbsolute(50 + off * spacing4), screenYAbsolute(125+voff*75), screenXAbsolute(100), screenYAbsolute(50), f.getName(), defaultButtonColor, 0.8, textColor);
+                    child.color_hover = defaultButtonHoverColor;
+                    child.setCallbackOnClick(() -> {
+                        FSPPath = f.getName().replace("." + extension, "");
+                        preset = lastPreset;
+                        init();
+                        callback.run();
+                    });
+                    tmp.addChild(child);
+                }
+                child = new rendering_util.interactiveButton(screenXAbsolute(50 + 0 * spacing4), screenYAbsolute(500), screenXAbsolute(100), screenYAbsolute(50), "BACK", backColor, 1, textColor);
+                child.color_hover = backHoverColor;
+                child.setCallbackOnClick(() -> {
+                    preset = lastPreset;
+                    init();
+                });
+                tmp.addChild(child);
+                child = new rendering_util.interactiveButton(screenXAbsolute(50 + 1 * spacing4), screenYAbsolute(500), screenXAbsolute(100), screenYAbsolute(50), "PREV", defaultButtonColor, 1, textColor);
+                child.color_hover =defaultButtonHoverColor;
+                child.setCallbackOnClick(() -> {
+                    page = page -1;
+                    init();
+                });
+                tmp.addChild(child);
+                child = new rendering_util.interactiveButton(screenXAbsolute(50 + 2 * spacing4), screenYAbsolute(500), screenXAbsolute(100), screenYAbsolute(50), "NEXT", defaultButtonColor, 1, textColor);
+                child.color_hover = defaultButtonHoverColor;
+                child.setCallbackOnClick(() -> {
+                    page = page +1;
+                    init();
+                });
+                tmp.addChild(child);
+            } catch (Exception ex) {
+                preset = lastPreset;
+                init();
+            }
+            return;
+        }
+    }
+    public class FileSavePromt extends FilePrompt {
+        public FileSavePromt(Runnable callback){
+            this.callback = callback;
+            lastPreset = preset;
+            FSPPrompt = this;
+            setFileSavePreset();
+        }
+        public void setFileSavePreset() {
+            if (!macro.commandActions.isCompatible()) return;
+            drawableObjects.clear();
+            preset = 7;
+            rendering_util.drawableObject tmp;
+            rendering_util.drawableObject child;
+            rendering_util.drawableObject child2;
+
+            tmp = drawBackground();
+            drawHeader("SAVE FILE", tmp);
+            FSPPath = "";
+
+            try {
+                child = new rendering_util.interactiveButton(screenXAbsolute(0.5f * spacing3), screenYAbsolute(275), screenXAbsolute(spacing3), screenYAbsolute(50), "File Name:", new Color(0,0,0,0), textColor);
+                tmp.addChild(child);
+
+                interactiveTextField child11 = new rendering_util.interactiveTextField(screenXAbsolute(1.5f * spacing3), screenYAbsolute(275), screenXAbsolute(spacing4), screenYAbsolute(50), "", disabledColor, textColor);
+                child11.color_hover = disabledHoverColor;
+                tmp.addChild(child11);
+
+                child = new rendering_util.interactiveButton(screenXAbsolute(50 + 3 * spacing4), screenYAbsolute(500), screenXAbsolute(100), screenYAbsolute(50), "SAVE", defaultButtonColor, 1, textColor);
+                child.color_hover = defaultButtonHoverColor;
+                child.setCallbackOnClick(() -> {
+                    FSPPath = child11.field.getText();
+                    preset = lastPreset;
+                    init();
+                    callback.run();
+                });
+                tmp.addChild(child);
+
+                child = new rendering_util.interactiveButton(screenXAbsolute(50 + 2 * spacing4), screenYAbsolute(500), screenXAbsolute(100), screenYAbsolute(50), "BACK", backColor, 1, textColor);
+                child.color_hover = backHoverColor;
+                child.setCallbackOnClick(() -> {
+                    preset = lastPreset;
+                    init();
+                });
+                tmp.addChild(child);
+            } catch (Exception ex) {
+                preset = lastPreset;
+                init();
+            }
+            return;
+        }
     }
 
     public rendering_util.drawableObject drawBackground() {
@@ -469,12 +658,14 @@ public class umod_gui extends Screen {
         drawableObjects.add(tmp);
         return tmp;
     }
-    public rendering_util.drawableObject drawHeader(String txt,drawableObject tmp) {
+
+    public rendering_util.drawableObject drawHeader(String txt, drawableObject tmp) {
         rendering_util.drawableObject child;
         child = new rendering_util.interactiveButton(screenXAbsolute(0), screenYAbsolute(0), screenXAbsolute(600), screenYAbsolute(100), txt, headerColor, 2, textColor);
         tmp.addChild(child);
         return child;
     }
+
     public rendering_util.drawableObject drawBackButton(drawableObject tmp) {
         rendering_util.drawableObject child;
         child = new rendering_util.interactiveButton(screenXAbsolute(50), screenYAbsolute(500), screenXAbsolute(100), screenYAbsolute(50), "BACK", backColor, textColor);
@@ -483,7 +674,7 @@ public class umod_gui extends Screen {
         return child;
     }
 
-    public void showGUI(@Nullable Screen gui){
+    public void showGUI(@Nullable Screen gui) {
         Minecraft.getInstance().displayGuiScreen(gui);
     }
 }

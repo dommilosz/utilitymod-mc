@@ -13,6 +13,7 @@ public class module {
 			free_interact.execute(msg, args);
 			macro.execute(msg, args);
 			signwriter.execute(msg, args);
+			fullbright.execute(msg, args);
 		}
 	}
 }

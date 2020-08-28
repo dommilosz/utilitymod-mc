@@ -7,12 +7,14 @@ import net.minecraft.network.play.client.CPlayerDiggingPacket;
 import net.minecraft.network.play.client.CPlayerTryUseItemOnBlockPacket;
 
 import static com.dommilosz.utilmod.internalcommands.isElementOn;
+import static com.dommilosz.utilmod.internalcommands.properexecuted;
 
 public class free_interact {
     public static boolean enabled = false;
     public static void execute(String msg, String[] args) {
         if (isElementOn(args, "freeinteract", 2)) {
             commandActions.CAtoggle();
+            properexecuted = true;
         }
     }
     public static void ModifyPacketsToFreeInteract(IPacket packet,PacketEvent event){

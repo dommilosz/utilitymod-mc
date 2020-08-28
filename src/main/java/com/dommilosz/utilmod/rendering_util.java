@@ -130,9 +130,10 @@ public class rendering_util {
         }
 
         public boolean checkClick(int mouseX, int mouseY) {
+            try{
             for (drawableObject child : children) {
                 child.checkClick(mouseX, mouseY);
-            }
+            }}catch (Exception ex){}
             if (isHovered(mouseX, mouseY)) {
                 if (clicked_callback != null)
                     clicked_callback.run();
