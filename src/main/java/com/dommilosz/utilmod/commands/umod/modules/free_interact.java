@@ -36,7 +36,7 @@ public class free_interact {
     public static class commandActions{
         public static void CAtoggle(){
             enabled = !enabled;
-            packetIO.SendMessageToClient("[UMOD] FreeInteract is now: "+enabled);
+            packetIO.SendUMODMessageToClient("FreeInteract is now: $&b"+enabled);
         }
     }
 }

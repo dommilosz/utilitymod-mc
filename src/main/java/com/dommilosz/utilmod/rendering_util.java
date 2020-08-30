@@ -61,7 +61,7 @@ public class rendering_util {
     public static void drawText(String text, int x, int y, Color Color, double scale) {
         FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
         GL11.glPushMatrix();
-        GL11.glScalef((float)scale, (float) scale, (float) scale);
+        GL11.glScalef((float) scale, (float) scale, (float) scale);
         fontRenderer.drawStringWithShadow(text, x, y, ColortoHex(Color));
         //drawRect(x/scale,y/scale,50,50,new Color(255, 0, 0,255));
         GL11.glPopMatrix();
@@ -76,8 +76,8 @@ public class rendering_util {
         int rectw = rect.width;
         int recth = rect.height;
 
-        int x = (int) Math.floor((rectx + (rectw - fontWidth) / 2)/scale);
-        int y = (int) Math.floor((recty + ((recth - fontHeight) / 2))/scale);
+        int x = (int) Math.floor((rectx + (rectw - fontWidth) / 2) / scale);
+        int y = (int) Math.floor((recty + ((recth - fontHeight) / 2)) / scale);
         //drawRect(rect,new Color(255,255,255,100));
         drawText(text, x, y, Color, scale);
     }
@@ -108,6 +108,7 @@ public class rendering_util {
         Runnable hovered_callback;
         public Color color_hover;
         public Minecraft mc = Minecraft.getInstance();
+        public boolean disabled = false;
 
         public void drawThis(int mouseX, int mouseY, Color Color) {
 
@@ -130,10 +131,13 @@ public class rendering_util {
         }
 
         public boolean checkClick(int mouseX, int mouseY) {
-            try{
-            for (drawableObject child : children) {
-                child.checkClick(mouseX, mouseY);
-            }}catch (Exception ex){}
+            try {
+                for (drawableObject child : children) {
+                    child.checkClick(mouseX, mouseY);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
             if (isHovered(mouseX, mouseY)) {
                 if (clicked_callback != null)
                     clicked_callback.run();
@@ -143,6 +147,7 @@ public class rendering_util {
         }
 
         public boolean isHovered(int mouseX, int mouseY) {
+            if(disabled) return false;
             if (mouseX >= rect.getMinX() && mouseX <= rect.getMaxX()
                     && (mouseY >= rect.getMinY() && mouseY <= rect.getMaxY())) {
                 if (hovered_callback != null)
@@ -172,9 +177,21 @@ public class rendering_util {
                 child.handleKeyPress(key, scanCode, modifiers);
             }
         }
+
         public void handleCharTyped(int key, int scanCode) {
             for (drawableObject child : children) {
                 child.handleCharTyped(key, scanCode);
+            }
+        }
+
+        public void setDisabled(boolean state) {
+            this.disabled = state;
+        }
+
+        public void setDisabledChild(boolean state) {
+            this.disabled = state;
+            for (drawableObject o : children) {
+                o.setDisabledChild(state);
             }
         }
     }
@@ -210,9 +227,9 @@ public class rendering_util {
         public double scale;
 
         public interactiveText(int x, int y, int width, int height, String text, Color color, int scale) {
-            if(!scaling){
+            if (!scaling) {
                 this.scale = scale;
-            }else {
+            } else {
                 this.scale = scaleAbsolute(scale);
             }
             this.x = x;
@@ -235,9 +252,9 @@ public class rendering_util {
             this.rect = new Rectangle(x, y, width, height);
             this.color = color;
             color_hover = color;
-            if(!scaling){
+            if (!scaling) {
                 this.scale = scale;
-            }else {
+            } else {
                 this.scale = scaleAbsolute(scale);
             }
         }
@@ -263,9 +280,9 @@ public class rendering_util {
         public double scale = 1;
 
         public interactiveButton(int x, int y, int width, int height, String txt, Color color, double scale, Color txtColor) {
-            if(!scaling){
+            if (!scaling) {
                 this.scale = scale;
-            }else {
+            } else {
                 this.scale = scaleAbsolute(scale);
             }
             this.x = x;
@@ -290,9 +307,9 @@ public class rendering_util {
             rect = new Rectangle(x, y, width, height);
             this.text = txt;
             this.txtColor = txtColor;
-            if(!scaling){
+            if (!scaling) {
                 this.scale = scale;
-            }else {
+            } else {
                 this.scale = scaleAbsolute(scale);
             }
         }
@@ -313,18 +330,23 @@ public class rendering_util {
             }
         }
     }
+
     public static class interactiveTextField extends drawableObject {
-        public String text;
+        public String text(){
+            return field.getText();
+        }
         public Color txtColor;
         public double scale = 1;
         public boolean active = false;
         Runnable typed_callback;
         public TextFieldWidget field;
+        public String allowedCharacters;
+        public String oldTxt = "";
 
         public interactiveTextField(int x, int y, int width, int height, String txt, Color color, double scale, Color txtColor) {
-            if(!scaling){
+            if (!scaling) {
                 this.scale = scale;
-            }else {
+            } else {
                 this.scale = scaleAbsolute(scale);
             }
             this.x = x;
@@ -335,9 +357,8 @@ public class rendering_util {
             color_hover = color;
             rect = new Rectangle(x, y, width, height);
             this.scale = scale;
-            this.text = txt;
             this.txtColor = txtColor;
-            field =(new TextFieldWidget(Minecraft.getInstance().fontRenderer, x,y,width,height,text));
+            field = (new TextFieldWidget(Minecraft.getInstance().fontRenderer, x, y, width, height, txt));
             field.setText(txt);
 
         }
@@ -350,19 +371,20 @@ public class rendering_util {
             this.color = color;
             color_hover = color;
             rect = new Rectangle(x, y, width, height);
-            this.text = txt;
             this.txtColor = txtColor;
-            if(!scaling){
+            if (!scaling) {
                 this.scale = scale;
-            }else {
+            } else {
                 this.scale = scaleAbsolute(scale);
             }
-            field =(new TextFieldWidget(Minecraft.getInstance().fontRenderer, x,y,width,height,txt));
+            field = (new TextFieldWidget(Minecraft.getInstance().fontRenderer, x, y, width, height, txt));
             field.setText(txt);
         }
-        public void setTyped_callback(Runnable callback){
+
+        public void setTyped_callback(Runnable callback) {
             typed_callback = callback;
         }
+
         @Override
         public void drawThis(int mouseX, int mouseY, Color Color) {
             drawThis(mouseX, mouseY, Color, -255);
@@ -371,12 +393,12 @@ public class rendering_util {
         @Override
         public void drawThis(int mouseX, int mouseY, Color Color, float z) {
             if (!visible) return;
-            if(field!=null){
+            if (field != null) {
                 field.x = x;
                 field.y = y;
                 field.setWidth(width);
                 field.setHeight(height);
-                field.render(mouseX,mouseY,z);
+                field.render(mouseX, mouseY, z);
             }
 
             for (drawableObject child : children) {
@@ -386,8 +408,8 @@ public class rendering_util {
 
         @Override
         public boolean checkClick(int mouseX, int mouseY) {
-            if(field!=null)
-            field.mouseClicked(mouseX,mouseY,0);
+            if (field != null&&!disabled)
+                field.mouseClicked(mouseX, mouseY, 0);
             for (drawableObject child : children) {
                 child.checkClick(mouseX, mouseY);
             }
@@ -400,21 +422,170 @@ public class rendering_util {
             }
             return false;
         }
+
         @Override
-        public void handleKeyPress(int key,int scanCode,int modifiers){
-            field.keyPressed(key,scanCode,modifiers);
-            if (typed_callback != null)
-                typed_callback.run();
+        public void handleKeyPress(int key, int scanCode, int modifiers) {
+            oldTxt = text();
+            field.keyPressed(key, scanCode, modifiers);
             super.handleKeyPress(key, scanCode, modifiers);
+            if(!oldTxt.equals(text())){
+                if (typed_callback != null)
+                    typed_callback.run();
+            }
         }
 
         @Override
         public void handleCharTyped(int key, int scanCode) {
-            if(field!=null)
-            field.charTyped((char)key,scanCode);
-            if (typed_callback != null)
-                typed_callback.run();
+            oldTxt = text();
+            if (allowedCharacters == null || allowedCharacters.contains("" + (char) key)) {
+                if (field != null)
+                    field.charTyped((char) key, scanCode);
+            }
             super.handleCharTyped(key, scanCode);
+            if(!oldTxt.equals(text())){
+                if (typed_callback != null)
+                    typed_callback.run();
+            }
+        }
+    }
+    public static class interactiveIntTextField extends drawableObject{
+        public String text(){
+            return field.getText();
+        }
+        public Color txtColor;
+        public double scale = 1;
+        public boolean active = false;
+        Runnable typed_callback;
+        public TextFieldWidget field;
+        public String allowedCharacters;
+        public String oldTxt = "";
+        public int min = -1;
+        public int max = Integer.MAX_VALUE;
+        public int value(){
+            try{
+                return Integer.parseInt(field.getText());
+            }catch (Exception ex){return 0;}
+        }
+        public interactiveIntTextField(int x, int y, int width, int height, String txt, Color color, double scale, Color txtColor) {
+            if (!scaling) {
+                this.scale = scale;
+            } else {
+                this.scale = scaleAbsolute(scale);
+            }
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            this.allowedCharacters = "0123456789";
+            this.color = color;
+            color_hover = color;
+            rect = new Rectangle(x, y, width, height);
+            this.scale = scale;
+            this.txtColor = txtColor;
+            field = (new TextFieldWidget(Minecraft.getInstance().fontRenderer, x, y, width, height, txt));
+            field.setText(txt);
+
+        }
+
+        public interactiveIntTextField(int x, int y, int width, int height, String txt, Color color, Color txtColor) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            this.color = color;
+            color_hover = color;
+            this.allowedCharacters = "0123456789";
+            rect = new Rectangle(x, y, width, height);
+            this.txtColor = txtColor;
+            if (!scaling) {
+                this.scale = scale;
+            } else {
+                this.scale = scaleAbsolute(scale);
+            }
+            field = (new TextFieldWidget(Minecraft.getInstance().fontRenderer, x, y, width, height, txt));
+            field.setText(txt);
+        }
+
+        public void setTyped_callback(Runnable callback) {
+            typed_callback = callback;
+        }
+
+        @Override
+        public void drawThis(int mouseX, int mouseY, Color Color) {
+            drawThis(mouseX, mouseY, Color, -255);
+        }
+
+        @Override
+        public void drawThis(int mouseX, int mouseY, Color Color, float z) {
+            if (!visible) return;
+            if (field != null) {
+                field.x = x;
+                field.y = y;
+                field.setWidth(width);
+                field.setHeight(height);
+                field.render(mouseX, mouseY, z);
+            }
+
+            for (drawableObject child : children) {
+                child.drawThis(mouseX, mouseY, child.color, z + 1);
+            }
+        }
+
+        @Override
+        public boolean checkClick(int mouseX, int mouseY) {
+            if (field != null&&!disabled)
+                field.mouseClicked(mouseX, mouseY, 0);
+            for (drawableObject child : children) {
+                child.checkClick(mouseX, mouseY);
+            }
+            active = false;
+            if (isHovered(mouseX, mouseY)) {
+                active = true;
+                if (clicked_callback != null)
+                    clicked_callback.run();
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void handleKeyPress(int key, int scanCode, int modifiers) {
+            oldTxt = text();
+            field.keyPressed(key, scanCode, modifiers);
+            if(value()<min||value()>max){
+                if(value()<min){
+                    field.setText(String.valueOf(min));
+                }else {
+                    field.setText(String.valueOf(max));
+                }
+            }
+
+            super.handleKeyPress(key, scanCode, modifiers);
+            if(!oldTxt.equals(text())){
+                if (typed_callback != null)
+                    typed_callback.run();
+            }
+        }
+
+        @Override
+        public void handleCharTyped(int key, int scanCode) {
+            oldTxt = text();
+            if (allowedCharacters == null || allowedCharacters.contains("" + (char) key)) {
+                if (field != null)
+                    field.charTyped((char) key, scanCode);
+                if(value()<min||value()>max){
+                    if(value()<min){
+                        field.setText(String.valueOf(min));
+                    }else {
+                        field.setText(String.valueOf(max));
+                    }
+                }
+            }
+            super.handleCharTyped(key, scanCode);
+            if(!oldTxt.equals(text())){
+                if (typed_callback != null)
+                    typed_callback.run();
+            }
         }
     }
 
@@ -437,10 +608,12 @@ public class rendering_util {
         Screen scr = Minecraft.getInstance().currentScreen;
         return (int) Math.floor((scr.height / 1000f) * part);
     }
-    public static double scaleAbsolute(double scale){
+
+    public static double scaleAbsolute(double scale) {
         Screen scr = Minecraft.getInstance().currentScreen;
-        double scaled = ((double) (scr.height/320f)*(double)scale);
+        double scaled = ((double) (scr.height / 320f) * (double) scale);
         return scaled;
     }
+
     public static boolean scaling = false;
 }

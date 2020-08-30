@@ -24,6 +24,8 @@ public class signwriter {
     public static boolean enabled = false;
     public static String[] lines = new String[]{"", "", "", ""};
     public static int delay = 150;
+    public static int maxVal = 5000;
+    public static int minVal = 10;
 
     public static void execute(String msg, String[] args) {
         if (isElementOn(args, "signwriter", 2)) {
@@ -63,11 +65,11 @@ public class signwriter {
                 commandActions.CAsave(getElementOn(args, 4));
             }
             if (isElementOn(args, "lines", 3)) {
-                packetIO.SendMessageToClient("[UMOD] SignWriter Lines:");
-                packetIO.SendMessageToClient("Line1: \"" + lines[0] + "\"");
-                packetIO.SendMessageToClient("Line2: \"" + lines[1] + "\"");
-                packetIO.SendMessageToClient("Line3: \"" + lines[2] + "\"");
-                packetIO.SendMessageToClient("Line4: \"" + lines[3] + "\"");
+                packetIO.SendUMODMessageToClient("SignWriter Lines:");
+                packetIO.SendUMODMessageToClient("Line1: \"$&b" + lines[0] + "$&6\"");
+                packetIO.SendUMODMessageToClient("Line2: \"$&b" + lines[1] + "$&6\"");
+                packetIO.SendUMODMessageToClient("Line3: \"$&b" + lines[2] + "$&6\"");
+                packetIO.SendUMODMessageToClient("Line4: \"$&b" + lines[3] + "$&6\"");
                 properexecuted = true;
             }
         }
@@ -85,7 +87,7 @@ public class signwriter {
                     e.printStackTrace();
                 }
                 packetIO.SendPacketToServer(new CUpdateSignPacket(signPos, new StringTextComponent(lines[0]), new StringTextComponent(lines[1]), new StringTextComponent(lines[2]), new StringTextComponent(lines[3])));
-                packetIO.SendMessageToClient("[UMOD] SignWriter Sent Packet");
+                packetIO.SendUMODMessageToClient("SignWriter Sent Packet");
 
             }
         }
@@ -122,11 +124,11 @@ public class signwriter {
             writer.close();
 
         } catch (Exception ex) {
-            packetIO.SendMessageToClient("Error when saving lines!");
+            packetIO.SendUMODMessageToClient("$errError when saving lines!");
             return;
         }
 
-        packetIO.SendMessageToClient("Lines successfully saved!");
+        packetIO.SendUMODMessageToClient("$sucLines successfully saved!");
     }
 
     public static boolean load(String fileName) {
@@ -146,23 +148,23 @@ public class signwriter {
             lines[3] = alignobj.getString("line3");
 
         } catch (Exception ex) {
-            packetIO.SendMessageToClient("Error when loading lines!");
+            packetIO.SendUMODMessageToClient("$errError when loading lines!");
             return false;
         }
-        packetIO.SendMessageToClient("Lines successfully loaded!");
+        packetIO.SendUMODMessageToClient("$sucLines successfully loaded!");
         return true;
     }
 
     public static class commandActions {
         public static void CAon() {
             enabled = true;
-            packetIO.SendMessageToClient("[UMOD] SignWriter is now: " + enabled);
+            packetIO.SendUMODMessageToClient("SignWriter is now: " + enabled);
             properexecuted = true;
         }
 
         public static void CAoff() {
             enabled = false;
-            packetIO.SendMessageToClient("[UMOD] SignWriter is now: " + enabled);
+            packetIO.SendUMODMessageToClient("SignWriter is now: " + enabled);
             properexecuted = true;
         }
 
@@ -172,7 +174,7 @@ public class signwriter {
                 line = Integer.parseInt(index) - 1;
 
                 lines[line] = txt;
-                packetIO.SendMessageToClient("[UMOD] SignWriter line[" + (line + 1) + "] is now: \"" + lines[line]+"\"");
+                packetIO.SendUMODMessageToClient("SignWriter line[$&b" + (line + 1) + "$&6] is now: \"$&b" + lines[line]+"$&6\"");
                 properexecuted = true;
             } catch (Exception ex) {
             }
@@ -183,53 +185,53 @@ public class signwriter {
             lines[1] = "";
             lines[2] = "";
             lines[3] = "";
-            packetIO.SendMessageToClient("[UMOD] SignWriter lines cleared");
+            packetIO.SendUMODMessageToClient("SignWriter lines cleared");
             properexecuted = true;
         }
 
         public static void CAsetDelay(String delaystr) {
             properexecuted = true;
             if (delaystr.equals("")) {
-                packetIO.SendMessageToClient("[UMOD] SignWriter delay is: " + delay + "ms");
+                packetIO.SendUMODMessageToClient("SignWriter delay is: $&b" + delay + "ms");
                 properexecuted = true;
                 return;
             }
             try {
                 String ds = delaystr;
                 int di = Integer.parseInt(ds);
-                if (di >= 10 && di <= 2000) {
+                if (di >= minVal && di <= maxVal) {
                     delay = di;
-                    packetIO.SendMessageToClient("[UMOD] SignWriter delay is now: " + delay + "ms");
+                    packetIO.SendUMODMessageToClient("SignWriter delay is now: $&b" + delay + "ms");
                     return;
                 }
             } catch (Exception ex) {
-                packetIO.SendMessageToClient("[UMOD] SignWriter delay was not int");
+                packetIO.SendUMODMessageToClient("$errSignWriter delay was not int");
                 return;
             }
-            packetIO.SendMessageToClient("[UMOD] SignWriter delay was not in range [10-2000] ms");
+            packetIO.SendUMODMessageToClient("$errSignWriter delay was not in range ["+minVal+"-"+maxVal+"] ms");
 
 
         }
 
         public static void CAload(String filename) {
             if (filename.equals("")) {
-                packetIO.SendMessageToClient("[UMOD] Invalid lines file name");
+                packetIO.SendUMODMessageToClient("$errInvalid lines file name");
                 return;
             }
             load(filename);
             properexecuted = true;
-            packetIO.SendMessageToClient("[UMOD] Lines Loaded");
+            packetIO.SendUMODMessageToClient("$sucLines Loaded");
 
         }
 
         public static void CAsave(String filename) {
             if (filename.equals("")) {
-                packetIO.SendMessageToClient("[UMOD] Invalid lines file name");
+                packetIO.SendUMODMessageToClient("$errInvalid lines file name");
                 return;
             }
             save(filename);
             properexecuted = true;
-            packetIO.SendMessageToClient("[UMOD] Lines Saved to " + filename);
+            packetIO.SendUMODMessageToClient("$sucLines Saved to " + filename);
 
 
         }

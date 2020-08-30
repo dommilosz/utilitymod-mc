@@ -27,7 +27,7 @@ public class fullbright {
         }
         public static void CAtoggle(){
             enabled = !enabled;
-            packetIO.SendMessageToClient("[UMOD] Fullbright is now: "+enabled);
+            packetIO.SendUMODMessageToClient("Fullbright is now: $&b"+enabled);
             if(enabled)CAStart();else CAStop();
         }
     }

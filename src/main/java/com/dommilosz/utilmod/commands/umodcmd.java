@@ -1,6 +1,5 @@
 package com.dommilosz.utilmod.commands;
 import com.dommilosz.utilmod.commands.umod.*;
-import com.dommilosz.utilmod.commands.umod.modules.*;
 
 import static com.dommilosz.utilmod.internalcommands.*;
 import com.dommilosz.utilmod.packetIO;
@@ -13,8 +12,8 @@ public class umodcmd {
 			module.execute(msg,args);
 			gui.execute(msg,args);
 			if(!properexecuted){
-				packetIO.SendMessageToClient("Usage:");
-				packetIO.SendMessageToClient("/umod logging <in|out|all|off|filter OR /umod mod <module> <action...>");
+				packetIO.SendUMODMessageToClient("Usage:");
+				packetIO.SendUMODMessageToClient("/umod logging <in|out|all|off|filter OR /umod mod <module> <action...>");
 			}
 			return;
 		}

@@ -1,7 +1,7 @@
 package com.dommilosz.utilmod.commands.umod;
 
 import com.dommilosz.utilmod.packetIO;
-import com.dommilosz.utilmod.internalcommands.*;
+
 import static com.dommilosz.utilmod.internalcommands.*;
 
 public class logging {
@@ -36,18 +36,18 @@ public class logging {
 				properexecuted = true;
 				return;
 			}
-			packetIO.SendMessageToClient("Logging type is set to: " + logging_type);
-			packetIO.SendMessageToClient("Logging filter is set to: " + logging_filter);
+			packetIO.SendUMODMessageToClient("Logging type is set to: $&b" + logging_type);
+			packetIO.SendUMODMessageToClient("Logging filter is set to: $&b" + logging_filter);
 		}
 	}
 
 	public static void setLoggingType(String type) {
 		logging_type = type;
-		packetIO.SendMessageToClient("Logging type is now set to: " + type);
+		packetIO.SendUMODMessageToClient("Logging type is now set to: $&b" + type);
 	}
 
 	public static void setLoggingFilter(boolean enablefilter) {
 		logging_filter = enablefilter;
-		packetIO.SendMessageToClient("Logging filter is now set to: " + enablefilter);
+		packetIO.SendUMODMessageToClient("Logging filter is now set to: $&b" + enablefilter);
 	}
 }

@@ -224,12 +224,12 @@ public class try_jump {
 	public static class commandActions{
 		public static boolean isCompatible(){
 			if(auto_try_jump.enabled){
-				packetIO.SendMessageToClient("[UMOD] Tryjump is not compatible with AutoTryJump");
+				packetIO.SendUMODMessageToClient("$errTryjump is not compatible with AutoTryJump");
 				properexecuted = true;
 				return false;
 			}
 			if(macro.enabled){
-				packetIO.SendMessageToClient("[UMOD] Tryjump is not compatible with Macro");
+				packetIO.SendUMODMessageToClient("$errTryjump is not compatible with Macro");
 				properexecuted = true;
 				return false;
 			}
@@ -238,38 +238,38 @@ public class try_jump {
 
 		public static void CAstart() {
 			if(enabled){
-				packetIO.SendMessageToClient("[UMOD] Tryjump already Running");
+				packetIO.SendUMODMessageToClient("$errTryjump already Running");
 				properexecuted = true;
 				return;
 			}
 			start();
 			issuedEnabled = true;
 			properexecuted = true;
-			packetIO.SendMessageToClient("[UMOD] Tryjump Started");
+			packetIO.SendUMODMessageToClient("Tryjump Started");
 		}
 
 		public static void CAdo() {
 			if(executing){
-				packetIO.SendMessageToClient("[UMOD] Tryjump already Executing");
+				packetIO.SendUMODMessageToClient("$errTryjump already Executing");
 				properexecuted = true;
 				return;
 			}
-			packetIO.SendMessageToClient("[UMOD] Tryjump Executing Started");
+			packetIO.SendUMODMessageToClient("Tryjump Executing Started");
 			executePackets();
 			properexecuted = true;
-			packetIO.SendMessageToClient("[UMOD] Tryjump Executing Ended");
+			packetIO.SendUMODMessageToClient("Tryjump Executing Ended");
 		}
 
 		public static void CAreset() {
 			if(executing){
-				packetIO.SendMessageToClient("[UMOD] Tryjump already executing -- Executing abort");
+				packetIO.SendUMODMessageToClient("Tryjump already executing -- Executing abort");
 				executingabort = true;
 				properexecuted = true;
 				reset();
 				return;
 			}
 			if(!enabled){
-				packetIO.SendMessageToClient("[UMOD] Tryjump is not enabled");
+				packetIO.SendUMODMessageToClient("$errTryjump is not enabled");
 				properexecuted = true;
 				reset();
 				return;
@@ -277,7 +277,7 @@ public class try_jump {
 			issuedEnabled = false;
 			properexecuted = true;
 			resetWithTP();
-			packetIO.SendMessageToClient("[UMOD] Tryjump Reset");
+			packetIO.SendUMODMessageToClient("Tryjump Reset");
 		}
 	}
 

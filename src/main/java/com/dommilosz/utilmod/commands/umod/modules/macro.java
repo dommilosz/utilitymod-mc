@@ -90,10 +90,10 @@ public class macro {
                 MacroManager.loadedPackets = packets;
 
             } catch (Exception ex) {
-                packetIO.SendMessageToClient("Error when loading macro!");
+                packetIO.SendUMODMessageToClient("$errError when loading macro!");
                 return false;
             }
-            packetIO.SendMessageToClient("Macro successfully loaded!");
+            packetIO.SendUMODMessageToClient("$sucMacro successfully loaded!");
             return true;
 
         }
@@ -128,11 +128,11 @@ public class macro {
                 writer.flush();
                 writer.close();
             } catch (Exception ex) {
-                packetIO.SendMessageToClient("Error when saving macro!");
+                packetIO.SendUMODMessageToClient("$errError when saving macro!");
                 return;
             }
 
-            packetIO.SendMessageToClient("Macro successfully saved!");
+            packetIO.SendUMODMessageToClient("$sucMacro successfully saved!");
         }
 
         public static void RotateAndAlign() {
@@ -240,7 +240,7 @@ public class macro {
             double Z = player.getPosZ();
             double Yaw = player.getYaw(0);
             double Pitch = player.getPitch(0);
-
+            if(loadedPackets==null)loadedPackets= new ArrayList<>();
             IPacket firstPacket = null;
             for (RelPacket p : MacroManager.loadedPackets) {
                 if (p.packet instanceof CPlayerPacket.PositionRotationPacket) {
@@ -391,13 +391,14 @@ public class macro {
             @Override
             public void run() {
 
-                packetIO.SendMessageToClient("[UMOD] Macro execution started");
+                packetIO.SendUMODMessageToClient("Macro execution started");
                 MacroManager.RotateAndAlign();
                 try_jump.start();
                 try_jump.TJpackets = MacroManager.toTJPackets();
                 try_jump.executePackets();
                 waitForEndOrDelay();
-                packetIO.SendMessageToClient("[UMOD] Macro execution ended");
+                enabled = false;
+                packetIO.SendUMODMessageToClient("Macro execution ended");
             }
         }).start();
 
@@ -412,19 +413,19 @@ public class macro {
             }
         }
     }
-
+    public static boolean recording = false;
     public static void reset() {
         enabled = false;
     }
     public static class commandActions{
         public static boolean isCompatible(){
             if (try_jump.issuedEnabled) {
-                packetIO.SendMessageToClient("[UMOD] Macro is not compatible with TryJump");
+                packetIO.SendUMODMessageToClient("$errMacro is not compatible with TryJump");
                 properexecuted = true;
                 return false;
             }
             if (auto_try_jump.enabled) {
-                packetIO.SendMessageToClient("[UMOD] Macro is not compatible with AutoTryJump");
+                packetIO.SendUMODMessageToClient("$errMacro is not compatible with AutoTryJump");
                 properexecuted = true;
                 return false;
             }
@@ -433,34 +434,34 @@ public class macro {
 
         public static void CAload(String filename) {
             if (try_jump.executing) {
-                packetIO.SendMessageToClient("[UMOD] Macro already Running");
+                packetIO.SendUMODMessageToClient("$errMacro already Running");
                 properexecuted = true;
                 return;
             }
             if (filename.equals("")) {
-                packetIO.SendMessageToClient("[UMOD] Invalid macro file name");
+                packetIO.SendUMODMessageToClient("$errInvalid macro file name");
                 return;
             }
             MacroManager.load(filename);
             properexecuted = true;
-            packetIO.SendMessageToClient("[UMOD] Macro Loaded");
+            packetIO.SendUMODMessageToClient("$sucMacro Loaded");
 
         }
 
         public static void CAsave(String filename) {
             if (filename.equals("")) {
-                packetIO.SendMessageToClient("[UMOD] Invalid macro file name");
+                packetIO.SendUMODMessageToClient("$errInvalid macro file name");
                 return;
             }
             MacroManager.save(filename);
             properexecuted = true;
-            packetIO.SendMessageToClient("[UMOD] Macro Saved to " + filename);
+            packetIO.SendUMODMessageToClient("$sucMacro Saved to " + filename);
 
         }
 
         public static void CAreset() {
             if (try_jump.executing) {
-                packetIO.SendMessageToClient("[UMOD] Macro already executing -- Executing abort");
+                packetIO.SendUMODMessageToClient("Macro already executing -- Executing abort");
                 try_jump.executingabort = true;
                 properexecuted = true;
                 enabled = false;
@@ -468,7 +469,7 @@ public class macro {
                 return;
             }
             if (!enabled) {
-                packetIO.SendMessageToClient("[UMOD] Macro is not enabled");
+                packetIO.SendUMODMessageToClient("$errMacro is not enabled");
                 properexecuted = true;
                 try_jump.reset();
                 return;
@@ -476,10 +477,11 @@ public class macro {
             enabled = false;
             properexecuted = true;
             try_jump.resetWithTP();
-            packetIO.SendMessageToClient("[UMOD] Macro Reset");
+            packetIO.SendUMODMessageToClient("Macro Reset");
         }
 
         public static void CArecord() {
+            recording = true;
             try_jump.start();
             PlayerEntity pl = Minecraft.getInstance().player;
 
@@ -494,14 +496,15 @@ public class macro {
             MacroManager.aligninfo.Yaw = pl.getYaw(0);
             MacroManager.aligninfo.Pitch = pl.getPitch(0);
 
-            packetIO.SendMessageToClient("[UMOD] Recording started");
+            packetIO.SendUMODMessageToClient("Recording started");
             properexecuted = true;
         }
 
         public static void CAendrecord() {
+            recording = false;
             MacroManager.loadedPackets = MacroManager.toRelPackets(try_jump.TJpackets);
             try_jump.resetWithTP();
-            packetIO.SendMessageToClient("[UMOD] Recording stopped");
+            packetIO.SendUMODMessageToClient("Recording stopped");
             properexecuted = true;
             MacroManager.save("0tmp01134");
             MacroManager.load("0tmp01134");
@@ -509,45 +512,45 @@ public class macro {
 
         public static void CAplay() {
             start();
-            packetIO.SendMessageToClient("[UMOD] Playback started.");
+            packetIO.SendUMODMessageToClient("Playback started.");
             properexecuted = true;
         }
 
         public static void CAloadplay(String filename) {
             if (try_jump.executing) {
-                packetIO.SendMessageToClient("[UMOD] Macro already Running");
+                packetIO.SendUMODMessageToClient("$errMacro already Running");
                 properexecuted = true;
                 return;
             }
             if (filename.equals("")) {
-                packetIO.SendMessageToClient("[UMOD] Invalid macro file name");
+                packetIO.SendUMODMessageToClient("$errInvalid macro file name");
                 return;
             }
             if(!MacroManager.load(filename))return;
             properexecuted = true;
-            packetIO.SendMessageToClient("[UMOD] Macro Loaded");
+            packetIO.SendUMODMessageToClient("$sucMacro Loaded");
             start();
-            packetIO.SendMessageToClient("[UMOD] Playback started.");
+            packetIO.SendUMODMessageToClient("Playback started.");
             properexecuted = true;
         }
 
         public static void CArotloadplay(String filename) {
             if (try_jump.executing) {
-                packetIO.SendMessageToClient("[UMOD] Macro already Running");
+                packetIO.SendUMODMessageToClient("$errMacro already Running");
                 properexecuted = true;
                 return;
             }
             if (filename.equals("")) {
-                packetIO.SendMessageToClient("[UMOD] Invalid macro file name");
+                packetIO.SendUMODMessageToClient("$errInvalid macro file name");
                 return;
             }
             String rotationStr = PF_getRotationString();
 
             if(!MacroManager.load(filename+"_"+rotationStr))return;
             properexecuted = true;
-            packetIO.SendMessageToClient("[UMOD] Macro Loaded");
+            packetIO.SendUMODMessageToClient("$sucMacro Loaded");
             start();
-            packetIO.SendMessageToClient("[UMOD] Playback started.");
+            packetIO.SendUMODMessageToClient("Playback started.");
             properexecuted = true;
         }
     }
