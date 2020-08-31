@@ -13,18 +13,21 @@ import static com.dommilosz.utilmod.internalcommands.properexecuted;
 
 public class gui {
     public static boolean enabled = false;
+
     public static void execute(String msg, String[] args) {
         if (isElementOn(args, "gui", 1)) {
             commandActions.CAShow();
             properexecuted = true;
         }
     }
-    public static void show(){
+
+    public static void show() {
         Minecraft.getInstance().displayGuiScreen(null);
         Minecraft.getInstance().displayGuiScreen(new umod_gui());
     }
-    public static class commandActions{
-        public static void CAShow(){
+
+    public static class commandActions {
+        public static void CAShow() {
             show();
         }
     }

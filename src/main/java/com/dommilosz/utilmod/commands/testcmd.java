@@ -8,11 +8,11 @@ import com.dommilosz.utilmod.packetIO;
 import static com.dommilosz.utilmod.internalcommands.*;
 
 public class testcmd {
-	public static void execute(String msg, String[] args) {
-		if (isElementOn(args, "/testcmd", 0)) {
+    public static void execute(String msg, String[] args) {
+        if (isElementOn(args, "/testcmd", 0)) {
 
-		}
-	}
+        }
+    }
 
 
 }

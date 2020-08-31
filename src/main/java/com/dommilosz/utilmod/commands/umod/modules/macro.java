@@ -23,12 +23,12 @@ public class macro {
 
     public static void execute(String msg, String[] args) {
         if (isElementOn(args, "macro", 2)) {
-            if(!commandActions.isCompatible())return;
+            if (!commandActions.isCompatible()) return;
             if (isElementOn(args, "load", 3)) {
-                commandActions.CAload(getElementOn(args,4));
+                commandActions.CAload(getElementOn(args, 4));
             }
             if (isElementOn(args, "save", 3)) {
-                commandActions.CAsave(getElementOn(args,4));
+                commandActions.CAsave(getElementOn(args, 4));
             }
             if (isElementOn(args, "reset", 3)) {
                 commandActions.CAreset();
@@ -43,15 +43,14 @@ public class macro {
                 commandActions.CAplay();
             }
             if (isElementOn(args, "loadplay", 3)) {
-                commandActions.CAloadplay(getElementOn(args,4));
+                commandActions.CAloadplay(getElementOn(args, 4));
             }
             if (isElementOn(args, "rotloadplay", 3)) {
-                commandActions.CArotloadplay(getElementOn(args,4));
+                commandActions.CArotloadplay(getElementOn(args, 4));
 
             }
         }
     }
-
 
 
     public static class MacroManager {
@@ -240,7 +239,7 @@ public class macro {
             double Z = player.getPosZ();
             double Yaw = player.getYaw(0);
             double Pitch = player.getPitch(0);
-            if(loadedPackets==null)loadedPackets= new ArrayList<>();
+            if (loadedPackets == null) loadedPackets = new ArrayList<>();
             IPacket firstPacket = null;
             for (RelPacket p : MacroManager.loadedPackets) {
                 if (p.packet instanceof CPlayerPacket.PositionRotationPacket) {
@@ -413,12 +412,15 @@ public class macro {
             }
         }
     }
+
     public static boolean recording = false;
+
     public static void reset() {
         enabled = false;
     }
-    public static class commandActions{
-        public static boolean isCompatible(){
+
+    public static class commandActions {
+        public static boolean isCompatible() {
             if (try_jump.issuedEnabled) {
                 packetIO.SendUMODMessageToClient("$errMacro is not compatible with TryJump");
                 properexecuted = true;
@@ -526,7 +528,7 @@ public class macro {
                 packetIO.SendUMODMessageToClient("$errInvalid macro file name");
                 return;
             }
-            if(!MacroManager.load(filename))return;
+            if (!MacroManager.load(filename)) return;
             properexecuted = true;
             packetIO.SendUMODMessageToClient("$sucMacro Loaded");
             start();
@@ -546,7 +548,7 @@ public class macro {
             }
             String rotationStr = PF_getRotationString();
 
-            if(!MacroManager.load(filename+"_"+rotationStr))return;
+            if (!MacroManager.load(filename + "_" + rotationStr)) return;
             properexecuted = true;
             packetIO.SendUMODMessageToClient("$sucMacro Loaded");
             start();

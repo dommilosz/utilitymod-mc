@@ -174,7 +174,7 @@ public class signwriter {
                 line = Integer.parseInt(index) - 1;
 
                 lines[line] = txt;
-                packetIO.SendUMODMessageToClient("SignWriter line[$&b" + (line + 1) + "$&6] is now: \"$&b" + lines[line]+"$&6\"");
+                packetIO.SendUMODMessageToClient("SignWriter line[$&b" + (line + 1) + "$&6] is now: \"$&b" + lines[line] + "$&6\"");
                 properexecuted = true;
             } catch (Exception ex) {
             }
@@ -208,7 +208,7 @@ public class signwriter {
                 packetIO.SendUMODMessageToClient("$errSignWriter delay was not int");
                 return;
             }
-            packetIO.SendUMODMessageToClient("$errSignWriter delay was not in range ["+minVal+"-"+maxVal+"] ms");
+            packetIO.SendUMODMessageToClient("$errSignWriter delay was not in range [" + minVal + "-" + maxVal + "] ms");
 
 
         }

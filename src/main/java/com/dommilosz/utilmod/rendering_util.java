@@ -147,7 +147,7 @@ public class rendering_util {
         }
 
         public boolean isHovered(int mouseX, int mouseY) {
-            if(disabled) return false;
+            if (disabled) return false;
             if (mouseX >= rect.getMinX() && mouseX <= rect.getMaxX()
                     && (mouseY >= rect.getMinY() && mouseY <= rect.getMaxY())) {
                 if (hovered_callback != null)
@@ -332,9 +332,10 @@ public class rendering_util {
     }
 
     public static class interactiveTextField extends drawableObject {
-        public String text(){
+        public String text() {
             return field.getText();
         }
+
         public Color txtColor;
         public double scale = 1;
         public boolean active = false;
@@ -408,7 +409,7 @@ public class rendering_util {
 
         @Override
         public boolean checkClick(int mouseX, int mouseY) {
-            if (field != null&&!disabled)
+            if (field != null && !disabled)
                 field.mouseClicked(mouseX, mouseY, 0);
             for (drawableObject child : children) {
                 child.checkClick(mouseX, mouseY);
@@ -428,7 +429,7 @@ public class rendering_util {
             oldTxt = text();
             field.keyPressed(key, scanCode, modifiers);
             super.handleKeyPress(key, scanCode, modifiers);
-            if(!oldTxt.equals(text())){
+            if (!oldTxt.equals(text())) {
                 if (typed_callback != null)
                     typed_callback.run();
             }
@@ -442,16 +443,18 @@ public class rendering_util {
                     field.charTyped((char) key, scanCode);
             }
             super.handleCharTyped(key, scanCode);
-            if(!oldTxt.equals(text())){
+            if (!oldTxt.equals(text())) {
                 if (typed_callback != null)
                     typed_callback.run();
             }
         }
     }
-    public static class interactiveIntTextField extends drawableObject{
-        public String text(){
+
+    public static class interactiveIntTextField extends drawableObject {
+        public String text() {
             return field.getText();
         }
+
         public Color txtColor;
         public double scale = 1;
         public boolean active = false;
@@ -461,11 +464,15 @@ public class rendering_util {
         public String oldTxt = "";
         public int min = -1;
         public int max = Integer.MAX_VALUE;
-        public int value(){
-            try{
+
+        public int value() {
+            try {
                 return Integer.parseInt(field.getText());
-            }catch (Exception ex){return 0;}
+            } catch (Exception ex) {
+                return 0;
+            }
         }
+
         public interactiveIntTextField(int x, int y, int width, int height, String txt, Color color, double scale, Color txtColor) {
             if (!scaling) {
                 this.scale = scale;
@@ -533,7 +540,7 @@ public class rendering_util {
 
         @Override
         public boolean checkClick(int mouseX, int mouseY) {
-            if (field != null&&!disabled)
+            if (field != null && !disabled)
                 field.mouseClicked(mouseX, mouseY, 0);
             for (drawableObject child : children) {
                 child.checkClick(mouseX, mouseY);
@@ -552,16 +559,16 @@ public class rendering_util {
         public void handleKeyPress(int key, int scanCode, int modifiers) {
             oldTxt = text();
             field.keyPressed(key, scanCode, modifiers);
-            if(value()<min||value()>max){
-                if(value()<min){
+            if (value() < min || value() > max) {
+                if (value() < min) {
                     field.setText(String.valueOf(min));
-                }else {
+                } else {
                     field.setText(String.valueOf(max));
                 }
             }
 
             super.handleKeyPress(key, scanCode, modifiers);
-            if(!oldTxt.equals(text())){
+            if (!oldTxt.equals(text())) {
                 if (typed_callback != null)
                     typed_callback.run();
             }
@@ -573,16 +580,16 @@ public class rendering_util {
             if (allowedCharacters == null || allowedCharacters.contains("" + (char) key)) {
                 if (field != null)
                     field.charTyped((char) key, scanCode);
-                if(value()<min||value()>max){
-                    if(value()<min){
+                if (value() < min || value() > max) {
+                    if (value() < min) {
                         field.setText(String.valueOf(min));
-                    }else {
+                    } else {
                         field.setText(String.valueOf(max));
                     }
                 }
             }
             super.handleCharTyped(key, scanCode);
-            if(!oldTxt.equals(text())){
+            if (!oldTxt.equals(text())) {
                 if (typed_callback != null)
                     typed_callback.run();
             }

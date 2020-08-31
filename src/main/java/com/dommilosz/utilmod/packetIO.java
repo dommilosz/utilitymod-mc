@@ -38,9 +38,11 @@ public class packetIO {
             showInGui = true;
         }
         Minecraft.getInstance().player.sendMessage(new StringTextComponent(prefix + " " + msg));
-        if(showInGui){
-            try{
-            umod_gui.umod_gui_obj.renderInfoPrompt(msg);}catch (Exception ex){}
+        if (showInGui) {
+            try {
+                umod_gui.umod_gui_obj.renderInfoPrompt(msg);
+            } catch (Exception ex) {
+            }
         }
     }
 
@@ -85,7 +87,7 @@ public class packetIO {
             try {
                 String classtxt = packet.getClass().toString();
                 classtxt = classtxt.split("\\.")[classtxt.split("\\.").length - 1];
-                SendUMODMessageToClient("$&7"+classtxt);
+                SendUMODMessageToClient("$&7" + classtxt);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }

@@ -11,32 +11,37 @@ import static com.dommilosz.utilmod.internalcommands.properexecuted;
 
 public class free_interact {
     public static boolean enabled = false;
+
     public static void execute(String msg, String[] args) {
         if (isElementOn(args, "freeinteract", 2)) {
             commandActions.CAtoggle();
             properexecuted = true;
         }
     }
-    public static void ModifyPacketsToFreeInteract(IPacket packet,PacketEvent event){
-        if(enabled){
-            if(packet instanceof CPlayerTryUseItemOnBlockPacket){
+
+    public static void ModifyPacketsToFreeInteract(IPacket packet, PacketEvent event) {
+        if (enabled) {
+            if (packet instanceof CPlayerTryUseItemOnBlockPacket) {
                 event.setCanceled(true);
             }
-            if(packet instanceof CPlayerDiggingPacket){
+            if (packet instanceof CPlayerDiggingPacket) {
                 event.setCanceled(true);
             }
         }
     }
-    public static void reset(){
+
+    public static void reset() {
         enabled = false;
     }
-    public static void start(){
+
+    public static void start() {
         enabled = true;
     }
-    public static class commandActions{
-        public static void CAtoggle(){
+
+    public static class commandActions {
+        public static void CAtoggle() {
             enabled = !enabled;
-            packetIO.SendUMODMessageToClient("FreeInteract is now: $&b"+enabled);
+            packetIO.SendUMODMessageToClient("FreeInteract is now: $&b" + enabled);
         }
     }
 }

@@ -14,49 +14,53 @@ import java.util.List;
 import static com.dommilosz.utilmod.internalcommands.resetmods;
 
 public class EventSubscribers {
-	
-	@SubscribeEvent
-	public void packetDisplay(PacketEvent event) {
 
-	}
-	
-	@SubscribeEvent
-	public void incoming(PacketEvent.Incoming event) {
-		IPacket packet = event.getPacket();
-		packetEvents.onIncoming(event,packet);
+    @SubscribeEvent
+    public void packetDisplay(PacketEvent event) {
 
-		onEvery(event,"in");
-	}
-	
-	@SubscribeEvent
-	public void outgoing(PacketEvent.Outgoing event) {
-		IPacket packet = event.getPacket();
-		packetEvents.onOutgoing(event,packet);
+    }
 
-		if(packet instanceof CChatMessagePacket) {
-			String msg = ((CChatMessagePacket) packet).getMessage();
-			packetEvents.onChat(msg,event,packet);
-		}
-		onEvery(event,"out");
-	}
-	List<IPacket> tmppackets = new ArrayList<IPacket>();
-	public void onEvery(PacketEvent event,String direction){
-		IPacket packet = event.getPacket();
-		packetEvents.onEvery(event,packet,direction);
+    @SubscribeEvent
+    public void incoming(PacketEvent.Incoming event) {
+        IPacket packet = event.getPacket();
+        packetEvents.onIncoming(event, packet);
 
-		if(packet instanceof STabCompletePacket)tmppackets.add(packet);
-		if(packet instanceof CTabCompletePacket)tmppackets.add(packet);
+        onEvery(event, "in");
+    }
 
-	}
-	@SubscribeEvent
-	public void onWorldLoad(WorldEvent.Load event) {
-		resetmods();
+    @SubscribeEvent
+    public void outgoing(PacketEvent.Outgoing event) {
+        IPacket packet = event.getPacket();
+        packetEvents.onOutgoing(event, packet);
 
-	}
-	@SubscribeEvent
-	public void onWorldUnload(WorldEvent.Unload event){
-		resetmods();
-	}
+        if (packet instanceof CChatMessagePacket) {
+            String msg = ((CChatMessagePacket) packet).getMessage();
+            packetEvents.onChat(msg, event, packet);
+        }
+        onEvery(event, "out");
+    }
 
-	
+    List<IPacket> tmppackets = new ArrayList<IPacket>();
+
+    public void onEvery(PacketEvent event, String direction) {
+        IPacket packet = event.getPacket();
+        packetEvents.onEvery(event, packet, direction);
+
+        if (packet instanceof STabCompletePacket) tmppackets.add(packet);
+        if (packet instanceof CTabCompletePacket) tmppackets.add(packet);
+
+    }
+
+    @SubscribeEvent
+    public void onWorldLoad(WorldEvent.Load event) {
+        resetmods();
+
+    }
+
+    @SubscribeEvent
+    public void onWorldUnload(WorldEvent.Unload event) {
+        resetmods();
+    }
+
+
 }

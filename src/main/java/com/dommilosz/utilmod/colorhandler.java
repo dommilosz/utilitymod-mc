@@ -2,7 +2,7 @@ package com.dommilosz.utilmod;
 
 public class colorhandler {
 
-    public static class Color{
+    public static class Color {
         public static String BLACK = fcode('0');
         public static String DARKBLUE = fcode('1');
         public static String DARK_GREEN = fcode('2');
@@ -19,7 +19,8 @@ public class colorhandler {
         public static String LIGHT_PURPLE = fcode('d');
         public static String YELLOW = fcode('e');
         public static String WHITE = fcode('f');
-        public static String fcode(char c){
+
+        public static String fcode(char c) {
             String a = "";
             a += '\u00a7';
             a += c;
