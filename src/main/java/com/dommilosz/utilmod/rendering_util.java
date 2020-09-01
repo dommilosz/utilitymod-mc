@@ -139,8 +139,7 @@ public class rendering_util {
                 ex.printStackTrace();
             }
             if (isHovered(mouseX, mouseY)) {
-                if (clicked_callback != null)
-                    clicked_callback.run();
+                runCallback(clicked_callback);
                 return true;
             }
             return false;
@@ -150,8 +149,7 @@ public class rendering_util {
             if (disabled) return false;
             if (mouseX >= rect.getMinX() && mouseX <= rect.getMaxX()
                     && (mouseY >= rect.getMinY() && mouseY <= rect.getMaxY())) {
-                if (hovered_callback != null)
-                    hovered_callback.run();
+                runCallback(hovered_callback);
                 return true;
             }
             return false;
@@ -417,8 +415,7 @@ public class rendering_util {
             active = false;
             if (isHovered(mouseX, mouseY)) {
                 active = true;
-                if (clicked_callback != null)
-                    clicked_callback.run();
+                runCallback(clicked_callback);
                 return true;
             }
             return false;
@@ -430,8 +427,7 @@ public class rendering_util {
             field.keyPressed(key, scanCode, modifiers);
             super.handleKeyPress(key, scanCode, modifiers);
             if (!oldTxt.equals(text())) {
-                if (typed_callback != null)
-                    typed_callback.run();
+                runCallback(typed_callback);
             }
         }
 
@@ -444,8 +440,7 @@ public class rendering_util {
             }
             super.handleCharTyped(key, scanCode);
             if (!oldTxt.equals(text())) {
-                if (typed_callback != null)
-                    typed_callback.run();
+                runCallback(typed_callback);
             }
         }
     }
@@ -548,8 +543,7 @@ public class rendering_util {
             active = false;
             if (isHovered(mouseX, mouseY)) {
                 active = true;
-                if (clicked_callback != null)
-                    clicked_callback.run();
+                runCallback(clicked_callback);
                 return true;
             }
             return false;
@@ -569,8 +563,7 @@ public class rendering_util {
 
             super.handleKeyPress(key, scanCode, modifiers);
             if (!oldTxt.equals(text())) {
-                if (typed_callback != null)
-                    typed_callback.run();
+                runCallback(typed_callback);
             }
         }
 
@@ -590,8 +583,7 @@ public class rendering_util {
             }
             super.handleCharTyped(key, scanCode);
             if (!oldTxt.equals(text())) {
-                if (typed_callback != null)
-                    typed_callback.run();
+                runCallback(typed_callback);
             }
         }
     }
@@ -623,4 +615,14 @@ public class rendering_util {
     }
 
     public static boolean scaling = false;
+    public static void runCallback(Runnable callback){
+        try{
+            if(callback!=null){
+                callback.run();
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+            packetIO.SendUMODMessageToClient(ex.toString());
+        }
+    }
 }

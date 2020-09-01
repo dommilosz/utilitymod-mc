@@ -2,6 +2,7 @@ package com.dommilosz.utilmod.commands.umod.modules;
 
 import javax.script.*;
 
+import com.dommilosz.utilmod.jsapi;
 import com.dommilosz.utilmod.packetIO;
 import com.dommilosz.utilmod.packetevent.PacketEvent;
 import javafx.beans.property.IntegerProperty;
@@ -17,7 +18,7 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import static com.dommilosz.utilmod.internalcommands.*;
-import static com.dommilosz.utilmod.jsapi.cleanListeners;
+import static com.dommilosz.utilmod.jsapi.*;
 
 public class javascript_engine {
 
@@ -46,8 +47,31 @@ public class javascript_engine {
                 cleanListeners();
                 return;
             }
+            if (isElementOn(args, "$l", 3)) {
+                int count = jsapi.onChat.size()+jsapi.onPacketIN.size()+jsapi.onPacketOUT.size()+jsapi.onCMD.size()+ onGUI.size()+ onGUIRender.size();
+                packetIO.SendUMODMessageToClient("Listeners ("+count+"):");
+
+                printInfoAboutListeners(onPacketIN,"onPacketIN");
+                printInfoAboutListeners(onPacketOUT,"onPacketOUT");
+                printInfoAboutListeners(onChat,"onChat");
+                printInfoAboutListeners(onCMD,"onCMD");
+                printInfoAboutListeners(onGUI,"onGUI");
+                printInfoAboutListeners(onGUIRender,"onGUIRender");
+                return;
+            }
             javascript_engine.commandActions.CAExec(code.subList(3, code.size()));
         }
+    }
+    public static void printInfoAboutListeners(List<JSListener> array,String displayName){
+        if(array.size()<1)return;
+        String toWrite = "";
+        toWrite+=displayName+" ("+array.size()+"):\n";
+        List<String> names = new ArrayList<>();
+        for (jsapi.JSListener jsListener:array){
+            names.add("\""+jsListener.name+"\"");
+        }
+        toWrite += String.valueOf(names);
+        packetIO.SendUMODMessageToClient(toWrite);
     }
 
     public static ScriptEngineManager manager;

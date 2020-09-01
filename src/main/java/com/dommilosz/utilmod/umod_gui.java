@@ -25,6 +25,7 @@ public class umod_gui extends Screen {
     public umod_gui() {
         super(getTitleS());
         umod_gui_obj = this;
+        jsapi.onGUIMake(this);
     }
 
     @Override
@@ -38,9 +39,10 @@ public class umod_gui extends Screen {
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
+        try{
         for (rendering_util.drawableObject DObject : drawableObjects) {
             DObject.render(mouseX, mouseY);
-        }
+        }}catch (Exception ex){}
         super.render(mouseX, mouseY, partialTicks);
     }
 
@@ -89,7 +91,7 @@ public class umod_gui extends Screen {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         renderPreset();
     }
 
@@ -121,11 +123,11 @@ public class umod_gui extends Screen {
                 drawableObjects.clear();
                 break;
             case 0:
-            default:
                 setMainPreset();
         }
         if (infoPrompt != null) renderInfoPrompt(infoPrompt);
         scaling = false;
+        jsapi.onGUIRenderMake(this);
     }
 
     @Override
@@ -626,9 +628,10 @@ public class umod_gui extends Screen {
     public String infoPrompt = null;
 
     public void renderInfoPrompt(String msg) {
+        try{
         for (drawableObject obj : drawableObjects) {
             obj.setDisabledChild(true);
-        }
+        }}catch (Exception ex){}
         infoPrompt = msg;
         drawableObject tmp;
         drawableObject tmp2;

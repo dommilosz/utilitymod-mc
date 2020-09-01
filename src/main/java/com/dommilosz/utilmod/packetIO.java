@@ -1,7 +1,6 @@
 package com.dommilosz.utilmod;
 
 import com.dommilosz.utilmod.commands.umod.logging;
-import com.dommilosz.utilmod.colorhandler;
 
 import static com.dommilosz.utilmod.colorhandler.Color.*;
 import static com.dommilosz.utilmod.umod.commandLine;
@@ -18,30 +17,34 @@ import java.io.IOException;
 import java.util.regex.Pattern;
 
 public class packetIO {
-    public static String prefix = GOLD + "[" + DARK_PURPLE + "UMOD" + GOLD + "]";
-    public static String prefix_RAW = "[UMOD]";
+    public static String prefix = "$&6[$&5UMOD$&6] ";
 
     public static void SendPacketToServer(IPacket<?> packet) {
         if(commandLine){return;}
         Minecraft.getInstance().player.connection.sendPacket(packet);
     }
-
-    public static void SendUMODMessageToClient(String msg) {
-        if(commandLine){System.out.println(prefix_RAW+msg);return;}
+    public static void SendUMODMessageToClient(String msg) {SendUMODMessageToClient(msg,true);}
+    public static void SendUMODMessageToClient(String msg,boolean isPrefix) {
+        if(isPrefix)msg = prefix +msg;
         String chars = "0123456789abcdef";
         for (char c : chars.toCharArray()) {
+            if(commandLine){
+                msg = msg.replaceAll(Pattern.quote("$&" + c), "");
+            }
             msg = msg.replaceAll(Pattern.quote("$&" + c), fcode(c));
         }
         boolean showInGui = false;
         if (msg.startsWith("$err")) {
+            if(commandLine)msg = msg.replace("$err", "");
             msg = msg.replace("$err", RED);
             showInGui = true;
         }
         if (msg.startsWith("$suc")) {
+            if(commandLine)msg = msg.replace("$err", "");
             msg = msg.replace("$suc", GREEN);
             showInGui = true;
         }
-        Minecraft.getInstance().player.sendMessage(new StringTextComponent(prefix + " " + msg));
+        SendMessageToClient(msg);
         if (showInGui) {
             try {
                 umod_gui.umod_gui_obj.renderInfoPrompt(msg);

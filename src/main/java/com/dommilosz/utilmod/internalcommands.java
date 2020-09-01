@@ -25,9 +25,10 @@ public class internalcommands {
     }
 
     public static void executeAll(String msg) {
-        jsapi.onCMDMake(msg);
         properexecuted = false;
         executed = false;
+        jsapi.onCMDMake(msg);
+        if(executed)return;
         String[] args = msg.split(" ");
         umodcmd.execute(msg, args);
     }
