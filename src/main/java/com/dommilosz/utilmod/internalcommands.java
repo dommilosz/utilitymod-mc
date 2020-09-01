@@ -2,8 +2,12 @@ package com.dommilosz.utilmod;
 
 import com.dommilosz.utilmod.commands.umod.modules.auto_try_jump;
 import com.dommilosz.utilmod.commands.umod.modules.free_interact;
+import com.dommilosz.utilmod.commands.umod.modules.javascript_engine;
 import com.dommilosz.utilmod.commands.umod.modules.try_jump;
 import com.dommilosz.utilmod.commands.umodcmd;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class internalcommands {
     public static boolean executed = false;
@@ -21,6 +25,7 @@ public class internalcommands {
     }
 
     public static void executeAll(String msg) {
+        jsapi.onCMDMake(msg);
         properexecuted = false;
         executed = false;
         String[] args = msg.split(" ");

@@ -4,6 +4,7 @@ import com.dommilosz.utilmod.commands.umod.logging;
 import com.dommilosz.utilmod.colorhandler;
 
 import static com.dommilosz.utilmod.colorhandler.Color.*;
+import static com.dommilosz.utilmod.umod.commandLine;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
@@ -18,12 +19,15 @@ import java.util.regex.Pattern;
 
 public class packetIO {
     public static String prefix = GOLD + "[" + DARK_PURPLE + "UMOD" + GOLD + "]";
+    public static String prefix_RAW = "[UMOD]";
 
     public static void SendPacketToServer(IPacket<?> packet) {
+        if(commandLine){return;}
         Minecraft.getInstance().player.connection.sendPacket(packet);
     }
 
     public static void SendUMODMessageToClient(String msg) {
+        if(commandLine){System.out.println(prefix_RAW+msg);return;}
         String chars = "0123456789abcdef";
         for (char c : chars.toCharArray()) {
             msg = msg.replaceAll(Pattern.quote("$&" + c), fcode(c));
@@ -47,14 +51,17 @@ public class packetIO {
     }
 
     public static void SendMessageToClient(String msg) {
+        if(commandLine){System.out.println(msg);return;}
         Minecraft.getInstance().player.sendMessage(new StringTextComponent(msg));
     }
 
     public static void SendStatusMessageToClient(String msg, boolean actionbar) {
+        if(commandLine){System.out.println(msg);return;}
         Minecraft.getInstance().player.sendStatusMessage(new StringTextComponent(msg), actionbar);
     }
 
     public static void SendChat(String msg) {
+        if(commandLine){System.out.println(msg);return;}
         SendPacketToServer(new CChatMessagePacket(msg));
     }
 

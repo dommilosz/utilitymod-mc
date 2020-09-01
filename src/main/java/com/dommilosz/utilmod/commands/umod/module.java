@@ -14,6 +14,7 @@ public class module {
             macro.execute(msg, args);
             signwriter.execute(msg, args);
             fullbright.execute(msg, args);
+            javascript_engine.execute(msg, args);
         }
     }
 }
